@@ -1,0 +1,11 @@
+# ランタイム生成物（本番はNASのデータ領域 /share/.incident_data/ に置かれる）
+*.db
+*.db-wal
+*.db-shm
+incidents.db*
+notify.log
+
+# OS / エディタ
+.DS_Store
+Thumbs.db
+.vscode/
