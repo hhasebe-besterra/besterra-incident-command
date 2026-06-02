@@ -7,12 +7,24 @@
  * 設定ファイル
  */
 
-define('INC_DB_PATH', '/share/CACHEDEV1_DATA/.incident_data/incidents.db');
+/**
+ * データ保存先（DB・ログ）。環境ごとに自動切替。
+ *  - 環境変数 INC_DATA_DIR があればそれを使う（クラウド: Render等で /var/data 等を指定）
+ *  - NAS（/share/.../.incident_data が存在）ならそこ
+ *  - それ以外は アプリ直下 .data/（汎用PHPホスト）
+ */
+$INC_DATA_DIR = getenv('INC_DATA_DIR');
+if (!$INC_DATA_DIR) {
+    $INC_DATA_DIR = is_dir('/share/CACHEDEV1_DATA/.incident_data')
+        ? '/share/CACHEDEV1_DATA/.incident_data'
+        : __DIR__ . '/.data';
+}
+define('INC_DB_PATH', $INC_DATA_DIR . '/incidents.db');
 
 define('INC_APP_NAME', 'BESTERRA // INCIDENT COMMAND');
 define('INC_APP_TAG',  '情報システム部 サービスデスク');
 define('INC_TZ', 'Asia/Tokyo');
-define('INC_BASE_URL', 'http://192.168.1.10/incident/');
+define('INC_BASE_URL', getenv('INC_BASE_URL') ?: 'http://192.168.1.10/incident/');
 
 // 準拠モデル（UIの「準拠モデル」パネル・ヘッダーバッジで表示）
 define('INC_STANDARDS', 'ITIL 4 / HDI 準拠');
@@ -110,10 +122,10 @@ $INC_CHANNELS = [
  * 作成: Slack管理 → api.slack.com/apps → Incoming Webhooks ON → 通知先チャンネル選択 → 生成URLを貼付。
  * 空なら通知スキップ（アプリは正常動作）。全通知は INC_NOTIFY_LOG に追記。
  */
-define('INC_SLACK_WEBHOOK', '');
-define('INC_NOTIFY_LOG', '/share/CACHEDEV1_DATA/.incident_data/notify.log');
+// Slack Webhook は環境変数優先（クラウドでは Secret として設定）
+define('INC_SLACK_WEBHOOK', getenv('INC_SLACK_WEBHOOK') ?: '');
+define('INC_NOTIFY_LOG', $INC_DATA_DIR . '/notify.log');
 
-// 社員名簿（/emp の SmartHR名簿から生成。申告者/要求者の検索候補に使用）
-define('INC_EMP_PATH', '/share/CACHEDEV1_DATA/.incident_data/employees.json');
-// 担当候補（情シス4名＋経理・人事）— 担当欄の検索候補に使用
-define('INC_ASSIGNEE_PATH', '/share/CACHEDEV1_DATA/.incident_data/assignees.json');
+// 社員名簿/担当候補。リポジトリ同梱のJSONを優先（クラウド配置時）、無ければデータ領域
+define('INC_EMP_PATH', is_file(__DIR__ . '/employees.json') ? __DIR__ . '/employees.json' : $INC_DATA_DIR . '/employees.json');
+define('INC_ASSIGNEE_PATH', is_file(__DIR__ . '/assignees.json') ? __DIR__ . '/assignees.json' : $INC_DATA_DIR . '/assignees.json');
