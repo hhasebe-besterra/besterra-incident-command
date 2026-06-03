@@ -25,7 +25,7 @@
       <span class="logo-mark">◤◢</span>
       <div>
         <div class="brand-title" data-text="BESTERRA // INCIDENT COMMAND">BESTERRA // INCIDENT COMMAND</div>
-        <div class="brand-sub">情報システム部 — SECURE INCIDENT OPERATIONS CONSOLE</div>
+        <div class="brand-sub">ベステラIT — SECURE INCIDENT OPERATIONS CONSOLE</div>
       </div>
     </div>
     <pre id="boot-log" class="boot-log"></pre>

@@ -37,7 +37,7 @@ function inc_notify(string $event, array $t, string $actor, string $detail = '')
         'attachments' => [[ 'color' => $color, 'blocks' => [
             ['type'=>'header','text'=>['type'=>'plain_text','text'=>$title,'emoji'=>true]],
             ['type'=>'section','text'=>['type'=>'mrkdwn','text'=>$text]],
-            ['type'=>'context','elements'=>[['type'=>'mrkdwn','text'=>'BESTERRA // INCIDENT COMMAND ・ 情報システム部 ・ ITIL 4 / HDI']]],
+            ['type'=>'context','elements'=>[['type'=>'mrkdwn','text'=>'BESTERRA // INCIDENT COMMAND ・ ベステラIT ・ ITIL 4 / HDI']]],
         ]]]];
     $ch = curl_init($hook);
     curl_setopt_array($ch, [CURLOPT_POST=>true, CURLOPT_HTTPHEADER=>['Content-Type: application/json'],

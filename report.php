@@ -69,7 +69,7 @@ $s = $r['summary'];
   <div class="top">
     <div><h1><?=($period==='month'?'月次':'週次')?>サービスデスク・レポート</h1>
       <div class="label">対象期間 : <?=h($r['label'])?></div></div>
-    <div class="brand"><b>BESTERRA // INCIDENT COMMAND</b><br>情報システム部 ・ ITIL 4 / HDI 準拠<br>生成 <?=h(inc_fmt_dt($r['generated_at']))?></div>
+    <div class="brand"><b>BESTERRA // INCIDENT COMMAND</b><br>ベステラIT ・ ITIL 4 / HDI 準拠<br>生成 <?=h(inc_fmt_dt($r['generated_at']))?></div>
   </div>
   <div class="kpis">
     <div class="kpi"><div class="v gold"><?=$s['opened']?></div><div class="k">起票</div></div>
@@ -91,7 +91,7 @@ $s = $r['summary'];
   <h2>期間内に起票（<?=count($r['opened'])?>）</h2><?=tbl($r['opened'])?>
   <h2>期間内に解決（<?=count($r['resolved'])?>）</h2><?=tbl($r['resolved'])?>
   <h2>期末時点で未解決・継続対応（<?=count($r['carry'])?>）</h2><?=tbl($r['carry'])?>
-  <div class="foot"><span>BESTERRA 情報システム部 — サービスデスク（ITIL 4 / HDI 準拠）</span><span>本レポートは <?=h($me)?> により出力 / 監査用</span></div>
+  <div class="foot"><span>BESTERRA IT — サービスデスク（ITIL 4 / HDI 準拠）</span><span>本レポートは <?=h($me)?> により出力 / 監査用</span></div>
 </div>
 <?php if($auto): ?><script>window.addEventListener('load',()=>setTimeout(()=>window.print(),400));</script><?php endif; ?>
 </body></html>

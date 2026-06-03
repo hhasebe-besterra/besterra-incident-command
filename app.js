@@ -411,7 +411,7 @@ function renderReport(r){
   return `<div class="rep-doc">
     <div class="rep-head"><div><h2>${r.period==='month'?'月次':'週次'}サービスデスク・レポート</h2>
       <div class="t-meta" style="margin-top:6px">対象期間 : <b style="color:var(--cyan)">${esc(r.label)}</b></div></div>
-      <div class="meta">BESTERRA // INCIDENT COMMAND<br>情報システム部 ・ ITIL 4 / HDI 準拠<br>生成 ${esc(fmt(r.generated_at))}</div></div>
+      <div class="meta">BESTERRA // INCIDENT COMMAND<br>ベステラIT ・ ITIL 4 / HDI 準拠<br>生成 ${esc(fmt(r.generated_at))}</div></div>
     <div class="rep-kpis">
       <div class="rep-kpi"><div class="v" style="color:var(--gold)">${s.opened}</div><div class="k">期間内 起票</div></div>
       <div class="rep-kpi"><div class="v" style="color:var(--green)">${s.resolved}</div><div class="k">期間内 解決</div></div>

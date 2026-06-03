@@ -1,7 +1,7 @@
 <?php
 /**
  * BESTERRA // INCIDENT COMMAND
- * 情報システム部 サービスデスク / ITインシデント管理システム
+ * ベステラIT サービスデスク / ITインシデント管理システム
  * 準拠: ITIL 4 (2019) サービスマネジメント・プラクティス
  *       ＋ HDI (Help Desk Institute) サポートセンター実務指標
  * 設定ファイル
@@ -22,7 +22,7 @@ if (!$INC_DATA_DIR) {
 define('INC_DB_PATH', $INC_DATA_DIR . '/incidents.db');
 
 define('INC_APP_NAME', 'BESTERRA // INCIDENT COMMAND');
-define('INC_APP_TAG',  '情報システム部 サービスデスク');
+define('INC_APP_TAG',  'ベステラIT サービスデスク');
 define('INC_TZ', 'Asia/Tokyo');
 define('INC_BASE_URL', getenv('INC_BASE_URL') ?: 'http://192.168.1.10/incident/');
 
@@ -45,7 +45,7 @@ $INC_MODEL = [
  * role: operator=起票/対応 / admin=operator＋管理 / auditor=閲覧+レポートのみ（経営層監査）
  */
 $INC_SEED_USERS = [
-    // 情報システム部 サービスデスク
+    // ベステラIT サービスデスク
     ['username' => 'h.hasebe',   'display_name' => '長谷部', 'role' => 'admin',    'password' => 'besterra'],
     ['username' => 'h.murano',   'display_name' => '村野',   'role' => 'operator', 'password' => 'besterra'],
     ['username' => 'm.takeuchi', 'display_name' => '竹内',   'role' => 'operator', 'password' => 'besterra'],
