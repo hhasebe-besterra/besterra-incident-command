@@ -5,6 +5,9 @@
 incidents.db*
 notify.log
 
+# デプロイスクリプト（NAS認証情報を含むため公開リポジトリへ出さない）
+_deploy_nas.py
+
 # OS / エディタ
 .DS_Store
 Thumbs.db
