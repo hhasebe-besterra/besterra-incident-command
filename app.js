@@ -121,7 +121,7 @@ const statusChip = s => `<span class="st st-${s}"><i class="dot"></i>${M().statu
 const typeChip = t => `<span class="type-chip type-${t}">${M().types[t]?M().types[t].icon:''} ${M().types[t]?M().types[t].label:t}</span>`;
 const isWriter = () => State.user && State.user.role !== 'auditor';
 function calcPriority(i,u){ const w={H:3,M:2,L:1}; const s=(w[i]||2)+(w[u]||2); return {6:'P1',5:'P2',4:'P3',3:'P4',2:'P5'}[s]||'P3'; }
-function slaTag(inc){ if(['RESOLVED','CLOSED'].includes(inc.status)) return inc.sla_breached?`<span class="sla-tag bad">SLA超過</span>`:`<span class="sla-tag ok">SLA内</span>`;
+function slaTag(inc){ if(['RESOLVED','CLOSED','CANCELLED'].includes(inc.status)) return inc.sla_breached?`<span class="sla-tag bad">SLA超過</span>`:`<span class="sla-tag ok">SLA内</span>`;
   return inc.sla_breached?`<span class="sla-tag bad">SLA超過</span>`:`<span class="sla-tag">SLA: ${fmt(inc.sla_target)}</span>`; }
 
 /* ============================================================ LOGIN */

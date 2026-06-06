@@ -179,6 +179,7 @@ table.inc tbody tr:hover{background:rgba(62,230,255,.12)}
 .st-MONITORING{color:var(--gold)} .st-MONITORING .dot{background:var(--gold)}
 .st-RESOLVED{color:var(--green)} .st-RESOLVED .dot{background:var(--green)}
 .st-CLOSED{color:var(--dim)} .st-CLOSED .dot{background:var(--dim)}
+.st-CANCELLED{color:#c98a9a} .st-CANCELLED .dot{background:#c98a9a}
 
 /* ---- 優先度バッジ P1-P5 ---- */
 .badge.prio-P1{color:#fff;background:rgba(255,92,117,.20);border-color:var(--sev1);

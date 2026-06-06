@@ -85,7 +85,7 @@ try {
         if ($q !== '') { $where[] = "(title LIKE ? OR description LIKE ? OR code LIKE ? OR affected LIKE ?)";
             $like = "%$q%"; array_push($args, $like, $like, $like, $like); }
         $sql = "SELECT * FROM incidents" . ($where ? " WHERE " . implode(' AND ', $where) : '')
-             . " ORDER BY CASE WHEN status IN ('RESOLVED','CLOSED') THEN 1 ELSE 0 END, priority ASC, datetime(created_at) DESC LIMIT 500";
+             . " ORDER BY CASE WHEN status IN ('RESOLVED','CLOSED','CANCELLED') THEN 1 ELSE 0 END, priority ASC, datetime(created_at) DESC LIMIT 500";
         $st = $pdo->prepare($sql); $st->execute($args);
         $rows = $st->fetchAll();
         foreach ($rows as &$r) { $r['sla_target'] = inc_sla_target($r); $r['sla_breached'] = inc_sla_breached($r); }
@@ -114,7 +114,7 @@ try {
         $channel = $req['channel'] ?? ''; if ($channel && !isset($INC_CHANNELS[$channel])) $channel = '';
         $now = inc_now();
         $code = inc_next_code($pdo, $type);
-        $resolved_at = in_array($status, ['RESOLVED','CLOSED'], true) ? $now : null;
+        $resolved_at = in_array($status, ['RESOLVED','CLOSED','CANCELLED'], true) ? $now : null;
         $st = $pdo->prepare("INSERT INTO incidents
             (code,type,title,description,category,impact,urgency,priority,status,channel,affected,reporter,assignee,
              fcr,csat,workaround,root_cause,known_error,linked,created_by,created_at,updated_at,resolved_at)
@@ -166,8 +166,8 @@ try {
         if (isset($req['status']) && isset($INC_STATUSES[$req['status']]) && $req['status'] !== $cur['status']) {
             $new = $req['status']; $set[]="status = ?"; $args[]=$new;
             $changes[]="ステータス {$INC_STATUSES[$cur['status']]} → {$INC_STATUSES[$new]}";
-            if (in_array($new, ['RESOLVED','CLOSED'], true) && !$cur['resolved_at']) { $set[]="resolved_at = ?"; $args[]=$now; }
-            elseif (!in_array($new, ['RESOLVED','CLOSED'], true) && $cur['resolved_at']) { $set[]="resolved_at = NULL"; }
+            if (in_array($new, ['RESOLVED','CLOSED','CANCELLED'], true) && !$cur['resolved_at']) { $set[]="resolved_at = ?"; $args[]=$now; }
+            elseif (!in_array($new, ['RESOLVED','CLOSED','CANCELLED'], true) && $cur['resolved_at']) { $set[]="resolved_at = NULL"; }
         }
         if ($set) { $set[]="updated_at = ?"; $args[]=$now; $args[]=$id;
             $pdo->prepare("UPDATE incidents SET ".implode(', ',$set)." WHERE id = ?")->execute($args); }

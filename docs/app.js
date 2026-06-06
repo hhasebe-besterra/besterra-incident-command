@@ -67,7 +67,7 @@ const META = {
   impact:{H:'高 / 全社・基幹',M:'中 / 部門・複数名',L:'低 / 個人・軽微',U:'不明 / 判断できない'},
   urgency:{H:'高 / 即時',M:'中 / 当日中',L:'低 / 計画的'},
   priorities:{P1:{label:'P1 緊急',sla_hours:4},P2:{label:'P2 高',sla_hours:8},P3:{label:'P3 中',sla_hours:24},P4:{label:'P4 低',sla_hours:72},P5:{label:'P5 計画',sla_hours:168}},
-  statuses:{NEW:'新規',IN_PROGRESS:'対応中',ON_HOLD:'保留',RESOLVED:'解決済',CLOSED:'完了'},
+  statuses:{NEW:'新規',IN_PROGRESS:'対応中',ON_HOLD:'保留',RESOLVED:'解決済',CLOSED:'完了',CANCELLED:'中止'},
   open_statuses:['NEW','IN_PROGRESS','ON_HOLD'],
   categories:{NETWORK:'ネットワーク',SERVER:'サーバー / NAS',MAIL:'メール',PC:'PC / 端末',ACCOUNT:'アカウント / 権限',SAAS:'SaaS / クラウド',SECURITY:'セキュリティ',PRINTER:'複合機 / 印刷',OTHER:'その他'},
   channels:{phone:'電話',email:'メール',teams:'Teams / チャット',walkup:'口頭 / 来訪',self:'自己起票',monitoring:'監視検知'},
@@ -139,7 +139,7 @@ async function api(action, params={}){
       const {data,error}=await qy.limit(500);
       if(error) throw new Error(error.message);
       const rows=(data||[]).map(r=>({...r, sla_target:slaTarget(r), sla_breached:slaBreached(r)}));
-      rows.sort((a,b)=>{ const ao=['RESOLVED','CLOSED'].includes(a.status)?1:0, bo=['RESOLVED','CLOSED'].includes(b.status)?1:0;
+      rows.sort((a,b)=>{ const ao=['RESOLVED','CLOSED','CANCELLED'].includes(a.status)?1:0, bo=['RESOLVED','CLOSED','CANCELLED'].includes(b.status)?1:0;
         if(ao!==bo) return ao-bo; if(a.priority!==b.priority) return a.priority<b.priority?-1:1; return a.created_at<b.created_at?1:-1; });
       return {ok:true, incidents:rows};
     }
@@ -291,7 +291,7 @@ const prioBadge = p => `<span class="badge prio-${p}">${p}</span>`;
 const statusChip = s => `<span class="st st-${s}"><i class="dot"></i>${M().statuses[s]||s}</span>`;
 const typeChip = t => `<span class="type-chip type-${t}">${M().types[t]?M().types[t].icon:''} ${M().types[t]?M().types[t].label:t}</span>`;
 const isWriter = () => State.user && State.user.role !== 'auditor';
-function slaTag(inc){ if(['RESOLVED','CLOSED'].includes(inc.status)) return inc.sla_breached?`<span class="sla-tag bad">SLA超過</span>`:`<span class="sla-tag ok">SLA内</span>`;
+function slaTag(inc){ if(['RESOLVED','CLOSED','CANCELLED'].includes(inc.status)) return inc.sla_breached?`<span class="sla-tag bad">SLA超過</span>`:`<span class="sla-tag ok">SLA内</span>`;
   return inc.sla_breached?`<span class="sla-tag bad">SLA超過</span>`:`<span class="sla-tag">SLA: ${fmt(inc.sla_target)}</span>`; }
 
 /* ============================================================ LOGIN */

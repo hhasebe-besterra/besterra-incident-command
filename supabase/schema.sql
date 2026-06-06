@@ -78,7 +78,7 @@ begin
   select display_name into disp from public.profiles where id = auth.uid();
   new.created_by := coalesce(disp, new.created_by, 'unknown');
   new.created_at := now(); new.updated_at := now();
-  if new.status in ('RESOLVED','CLOSED') then new.resolved_at := now(); end if;
+  if new.status in ('RESOLVED','CLOSED','CANCELLED') then new.resolved_at := now(); end if;
   return new;
 end $$;
 drop trigger if exists trg_inc_bi on public.incidents;
@@ -89,8 +89,8 @@ create or replace function public.incidents_before_update()
 returns trigger language plpgsql as $$
 begin
   new.updated_at := now();
-  if new.status in ('RESOLVED','CLOSED') and old.resolved_at is null then new.resolved_at := now();
-  elsif new.status not in ('RESOLVED','CLOSED') then new.resolved_at := null; end if;
+  if new.status in ('RESOLVED','CLOSED','CANCELLED') and old.resolved_at is null then new.resolved_at := now();
+  elsif new.status not in ('RESOLVED','CLOSED','CANCELLED') then new.resolved_at := null; end if;
   return new;
 end $$;
 drop trigger if exists trg_inc_bu on public.incidents;

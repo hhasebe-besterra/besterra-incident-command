@@ -93,8 +93,11 @@ $INC_STATUSES = [
     'ON_HOLD'     => '保留',
     'RESOLVED'    => '解決済',
     'CLOSED'      => '完了',
+    'CANCELLED'   => '中止',
 ];
 $INC_OPEN_STATUSES = ['NEW', 'IN_PROGRESS', 'ON_HOLD'];
+// 終端（クローズ系）ステータス。SLA時計停止・open集計から除外
+$INC_CLOSED_STATUSES = ['RESOLVED', 'CLOSED', 'CANCELLED'];
 
 // ===== 分類 =====
 $INC_CATEGORIES = [
