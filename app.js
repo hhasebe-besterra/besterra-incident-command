@@ -7,6 +7,21 @@ const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
 
+// 種別のやさしい説明（専門用語が分からないメンバー向け・具体例つき）
+const TYPE_HELP = {
+  incident:{ def:'いつも使えているIT（PC・メール・ネット・社内システム）が、急に使えない・調子が悪い状態。とにかく早く元に戻すのが目的です。',
+    eg:'メールが送受信できない／PCが起動しない・固まる／Wi-Fi・ネットに繋がらない／共有フォルダ(NAS)が開けない／印刷できない／システムにログインできない／ウイルス警告が出た',
+    tip:'どれにするか迷ったら、まず「インシデント」を選べばOKです。' },
+  request:{ def:'壊れてはいないけれど「ITに○○してほしい」という依頼。新しく用意・変更してほしいことです。',
+    eg:'新しいPC・アカウントが欲しい／ソフトを入れてほしい／パスワードを再発行してほしい／権限を追加してほしい／メールの転送設定をしてほしい' },
+  problem:{ def:'同じトラブルが何度も繰り返し起きるとき、その“根っこの原因”を調べて再発を防ぐもの。主にIT担当が使います。',
+    eg:'毎週同じ時間にネットが落ちる／特定のPCで何度も同じエラー／複数人から同じ不具合が続けて報告される' },
+};
+function typeHelpHtml(t){ const h=TYPE_HELP[t]; if(!h) return '';
+  return `<div class="th-def">${esc(h.def)}</div>`
+    + `<div class="th-eg"><b>こんなとき：</b>${esc(h.eg)}</div>`
+    + (h.tip?`<div class="th-tip">💡 ${esc(h.tip)}</div>`:''); }
+
 const State = { meta:null, user:null, view:'dashboard', incidents:[], employees:[], assignees:[] };
 
 /* ---------- API ---------- */
@@ -347,7 +362,7 @@ function openNew(){
      <div><div class="t-meta">NEW TICKET</div><div class="dr-title">新規起票</div></div><button class="x">✕</button></div>
    <div class="dr-body">
      <div class="form-row"><label>種別 / TYPE</label><select class="inp" id="n-type">${opts(m.types,'incident',v=>v.icon+' '+v.label)}</select>
-       <div class="t-meta" id="n-typedesc"></div></div>
+       <div class="type-help" id="n-typehelp"></div></div>
      <div class="form-row"><label>件名 / TITLE *</label><input class="inp" id="n-title" placeholder="例: 本社7F無線LANが断続的に切断"></div>
      <div class="form-2">
        <div class="form-row"><label>影響度 / IMPACT</label><select class="inp" id="n-impact">${opts(m.impact,'M')}</select></div>
@@ -378,7 +393,7 @@ function openNew(){
    <div class="dr-foot"><button class="btn-ok" id="n-save">▶ 起票する</button></div>`);
 
   const refreshType=()=>{ const t=$('#n-type').value;
-    $('#n-typedesc').textContent=m.types[t].desc;
+    $('#n-typehelp').innerHTML=typeHelpHtml(t);
     $('#n-prob').classList.toggle('hide', t!=='problem');
     $('#n-replbl').textContent = t==='request' ? '要求者' : (t==='problem' ? '報告元' : '申告者');
   };
