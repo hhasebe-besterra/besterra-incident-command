@@ -23,6 +23,33 @@ function typeHelpHtml(t){ const h=TYPE_HELP[t]; if(!h) return '';
   return `<div class="th-def">${esc(h.def)}</div>`
     + `<div class="th-eg"><b>こんなとき：</b>${esc(h.eg)}</div>`
     + (h.tip?`<div class="th-tip">💡 ${esc(h.tip)}</div>`:''); }
+
+// 関連チケットを既存チケットの一覧からチェック選択（複数可・文字入力不要）
+async function initLinkPicker(hostId, selectedCsv, excludeCode){
+  const host=document.getElementById(hostId); if(!host) return;
+  const selected=new Set(String(selectedCsv||'').split(',').map(s=>s.trim()).filter(Boolean));
+  host.innerHTML='<div class="t-meta" style="padding:6px">読み込み中…</div>';
+  let rows=[];
+  try{ rows=(await api('list',{})).incidents||[]; }
+  catch(e){ host.innerHTML='<div class="t-meta" style="padding:6px">一覧の取得に失敗しました</div>'; return; }
+  if(excludeCode) rows=rows.filter(r=>r.code!==excludeCode);
+  host.innerHTML=`<input class="inp lk-search" placeholder="🔍 コード・件名でしぼり込み（任意）">
+    <div class="lk-list"></div><div class="lk-sel t-meta"></div>`;
+  const listEl=host.querySelector('.lk-list'), selEl=host.querySelector('.lk-sel');
+  const render=(filter='')=>{ const f=filter.trim().toLowerCase();
+    const shown=rows.filter(r=> !f || (r.code+' '+(r.title||'')).toLowerCase().includes(f));
+    listEl.innerHTML = shown.length ? shown.map(r=>{ const on=selected.has(r.code);
+      return `<label class="lk-item${on?' on':''}"><input type="checkbox" value="${esc(r.code)}" ${on?'checked':''}>`
+        +`<span class="lk-code">${esc(r.code)}</span><span class="lk-ttl">${esc(r.title||'')}</span>${statusChip(r.status)}</label>`;
+    }).join('') : '<div class="t-meta" style="padding:8px">該当チケットなし</div>'; };
+  const updSel=()=>{ selEl.textContent = selected.size ? '選択中: '+[...selected].join(' , ') : '選択なし（任意）'; };
+  render(''); updSel();
+  host.querySelector('.lk-search').oninput=e=>render(e.target.value);
+  listEl.onchange=e=>{ const c=e.target; if(!c.matches('input[type=checkbox]')) return;
+    if(c.checked) selected.add(c.value); else selected.delete(c.value);
+    const it=c.closest('.lk-item'); if(it) it.classList.toggle('on',c.checked); updSel(); };
+  host._getLinked=()=>[...selected].join(',');
+}
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
 const EMAIL_DOMAIN = '@besterra.co.jp';
 
@@ -418,7 +445,7 @@ async function openIncident(id){
     ${isProblem?`<div class="form-row"><label>ワークアラウンド（暫定対応）</label><textarea class="inp" id="e-wa">${esc(i.workaround||'')}</textarea></div>
       <div class="form-row"><label>根本原因</label><textarea class="inp" id="e-rc">${esc(i.root_cause||'')}</textarea></div>
       <div class="form-row"><label class="chk"><input type="checkbox" id="e-ke" ${i.known_error?'checked':''}> 既知のエラーとして登録</label></div>`:''}
-    <div class="form-row"><label>関連チケット（コード）</label><input class="inp" id="e-linked" value="${esc(i.linked||'')}" placeholder="例: PRB-2026-0001"></div>
+    <div class="form-row"><label>関連チケット（過去・対応中のチケットから選択）</label><div class="lk-pick" id="e-linkpick"></div></div>
     <div class="form-row"><label>対応メモ / コメント（タイムラインに記録）</label><textarea class="inp" id="e-note" placeholder="調査・対応・連絡事項…"></textarea></div>
   `:`<div class="sec-h">▶ 閲覧モード（監査）</div><div class="t-meta">監査ロールのため編集はできません。</div>`;
   openDrawer(`
@@ -450,10 +477,10 @@ async function openIncident(id){
   `);
   if(writer){
     const upd=()=>{ $('#e-prio').innerHTML=prioBadge(calcPriority($('#e-impact').value,$('#e-urgency').value)); };
-    $('#e-impact').onchange=upd; $('#e-urgency').onchange=upd; attachEmpAutocomplete($('#e-assignee'), ()=>State.assignees);
+    $('#e-impact').onchange=upd; $('#e-urgency').onchange=upd; attachEmpAutocomplete($('#e-assignee'), ()=>State.assignees); initLinkPicker('e-linkpick', i.linked, i.code);
     $('#e-save').onclick=async()=>{
       const p={ id, impact:$('#e-impact').value, urgency:$('#e-urgency').value, status:$('#e-status').value,
-        assignee:$('#e-assignee').value.trim(), fcr:$('#e-fcr').checked?1:0, csat:$('#e-csat').value, linked:$('#e-linked').value.trim(), note:$('#e-note').value.trim() };
+        assignee:$('#e-assignee').value.trim(), fcr:$('#e-fcr').checked?1:0, csat:$('#e-csat').value, linked:($('#e-linkpick')._getLinked?.()||''), note:$('#e-note').value.trim() };
       if(isProblem){ p.workaround=$('#e-wa').value.trim(); p.root_cause=$('#e-rc').value.trim(); p.known_error=$('#e-ke').checked?1:0; }
       try{ await api('update',p); toast(i.code+' を更新','ok'); closeDrawer(); refresh(); }catch(err){ toast(err.message,'bad'); } };
     $('#e-comment').onclick=async()=>{ const b=$('#e-note').value.trim(); if(!b) return toast('コメントを入力してください','bad');
@@ -492,7 +519,7 @@ function openNew(){
        <div class="form-row"><label>ワークアラウンド（暫定対応）</label><textarea class="inp" id="n-wa" placeholder="暫定的な回避策…"></textarea></div>
        <div class="form-row"><label>根本原因</label><textarea class="inp" id="n-rc" placeholder="判明していれば…"></textarea></div>
        <div class="form-row"><label class="chk"><input type="checkbox" id="n-ke"> 既知のエラーとして登録</label></div></div>
-     <div class="form-row"><label>関連チケット（コード・任意）</label><input class="inp" id="n-linked" placeholder="例: INC-2026-0003"></div>
+     <div class="form-row"><label>関連チケット（過去・対応中のチケットから選択／任意）</label><div class="lk-pick" id="n-linkpick"></div></div>
      <div class="form-row"><label>詳細 / DESCRIPTION</label><textarea class="inp" id="n-desc" placeholder="事象・発生日時・再現条件・初動…"></textarea></div>
      <label class="chk"><input type="checkbox" id="n-fcr"> 初回対応で解決済み（FCR）</label>
    </div>
@@ -501,13 +528,13 @@ function openNew(){
     $('#n-prob').classList.add('hide'); $('#n-replbl').textContent= t==='request'?'依頼者':(t==='problem'?'起案者':'申告者'); };
   const upd=()=>{ $('#n-prio').innerHTML=prioBadge(calcPriority($('#n-impact').value,$('#n-urgency').value)); };
   $('#n-type').onchange=refreshType; $('#n-impact').onchange=upd; $('#n-urgency').onchange=upd;
-  refreshType(); attachEmpAutocomplete($('#n-reporter')); attachEmpAutocomplete($('#n-assignee'), ()=>State.assignees); $('#n-title').focus();
+  refreshType(); attachEmpAutocomplete($('#n-reporter')); attachEmpAutocomplete($('#n-assignee'), ()=>State.assignees); initLinkPicker('n-linkpick','',''); $('#n-title').focus();
   $('#n-save').onclick=async()=>{
     const title=$('#n-title').value.trim(); if(!title) return toast('件名は必須です','bad');
     const p={ type:$('#n-type').value, title, impact:$('#n-impact').value, urgency:$('#n-urgency').value,
       category:$('#n-cat').value, channel:$('#n-channel').value, status:$('#n-status').value,
       assignee:$('#n-assignee').value.trim(), affected:$('#n-affected').value.trim(), reporter:$('#n-reporter').value.trim(),
-      linked:$('#n-linked').value.trim(), description:$('#n-desc').value.trim(), fcr:$('#n-fcr').checked?1:0 };
+      linked:($('#n-linkpick')._getLinked?.()||''), description:$('#n-desc').value.trim(), fcr:$('#n-fcr').checked?1:0 };
     if($('#n-type').value==='problem'){ p.workaround=$('#n-wa').value.trim(); p.root_cause=$('#n-rc').value.trim(); p.known_error=$('#n-ke').checked?1:0; }
     try{ const j=await api('create',p); toast('起票完了 — '+j.code,'ok'); closeDrawer(); refresh(); }catch(err){ toast(err.message,'bad'); }
   };
