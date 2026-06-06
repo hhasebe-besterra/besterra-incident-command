@@ -19,7 +19,7 @@ const META = {
     request :{label:'サービス要求',short:'REQ',icon:'✉',desc:'アカウント・権限・機器など定型サービスの要求'},
     problem :{label:'問題',short:'PRB',icon:'🧩',desc:'複数インシデントの根本原因（再発防止が目的）'},
   },
-  impact:{H:'高 / 全社・基幹',M:'中 / 部門・複数名',L:'低 / 個人・軽微'},
+  impact:{H:'高 / 全社・基幹',M:'中 / 部門・複数名',L:'低 / 個人・軽微',U:'不明 / 判断できない'},
   urgency:{H:'高 / 即時',M:'中 / 当日中',L:'低 / 計画的'},
   priorities:{P1:{label:'P1 緊急',sla_hours:4},P2:{label:'P2 高',sla_hours:8},P3:{label:'P3 中',sla_hours:24},P4:{label:'P4 低',sla_hours:72},P5:{label:'P5 計画',sla_hours:168}},
   statuses:{NEW:'新規',IN_PROGRESS:'対応中',ON_HOLD:'保留',RESOLVED:'解決済',CLOSED:'完了'},
