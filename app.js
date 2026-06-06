@@ -9,13 +9,15 @@ const sleep = ms => new Promise(r=>setTimeout(r,ms));
 
 // 種別のやさしい説明（専門用語が分からないメンバー向け・具体例つき）
 const TYPE_HELP = {
-  incident:{ def:'いつも使えているIT（PC・メール・ネット・社内システム）が、急に使えない・調子が悪い状態。とにかく早く元に戻すのが目的です。',
-    eg:'メールが送受信できない／PCが起動しない・固まる／Wi-Fi・ネットに繋がらない／共有フォルダ(NAS)が開けない／印刷できない／システムにログインできない／ウイルス警告が出た',
-    tip:'どれにするか迷ったら、まず「インシデント」を選べばOKです。' },
+  incident:{ def:'ITの困りごと・トラブル・「これどうやるの？」という質問の問合せ。いつも使えるIT（PC・メール・ネット・社内システム）が使えない・操作が分からない等。早く解決するのが目的です。',
+    eg:'メールが送受信できない／PCが起動しない・固まる／Wi-Fi・ネットに繋がらない／共有フォルダ(NAS)が開けない／印刷できない／操作方法が分からない／ウイルス警告が出た',
+    tip:'どれにするか迷ったら、まず「問合せ（インシデント）」を選べばOKです。' },
   request:{ def:'壊れてはいないけれど「ITに○○してほしい」という依頼。新しく用意・変更してほしいことです。',
     eg:'新しいPC・アカウントが欲しい／ソフトを入れてほしい／パスワードを再発行してほしい／権限を追加してほしい／メールの転送設定をしてほしい' },
-  problem:{ def:'同じトラブルが何度も繰り返し起きるとき、その“根っこの原因”を調べて再発を防ぐもの。主にIT担当が使います。',
-    eg:'毎週同じ時間にネットが落ちる／特定のPCで何度も同じエラー／複数人から同じ不具合が続けて報告される' },
+  problem:{ def:'今すぐ困っているわけではない、改善の提案・やってみたい計画・アイデア。「ITをこう良くしたい」という声を受け付けます。',
+    eg:'この作業を自動化・効率化したい／新しいツールを試したい／将来こうしたいという改善案／中長期で進めたい計画' },
+  other:{ def:'上のどれにも当てはまらないもの。種別に迷うときも、まずは気軽に起票してください。担当が内容を見て振り分けます。',
+    eg:'分類が分からない連絡事項／とりあえず相談したいこと' },
 };
 function typeHelpHtml(t){ const h=TYPE_HELP[t]; if(!h) return '';
   return `<div class="th-def">${esc(h.def)}</div>`
@@ -394,8 +396,8 @@ function openNew(){
 
   const refreshType=()=>{ const t=$('#n-type').value;
     $('#n-typehelp').innerHTML=typeHelpHtml(t);
-    $('#n-prob').classList.toggle('hide', t!=='problem');
-    $('#n-replbl').textContent = t==='request' ? '要求者' : (t==='problem' ? '報告元' : '申告者');
+    $('#n-prob').classList.add('hide');
+    $('#n-replbl').textContent = t==='request' ? '依頼者' : (t==='problem' ? '起案者' : '申告者');
   };
   const upd=()=>{ $('#n-prio').innerHTML=prioBadge(calcPriority($('#n-impact').value,$('#n-urgency').value)); };
   $('#n-type').onchange=refreshType; $('#n-impact').onchange=upd; $('#n-urgency').onchange=upd;
@@ -487,7 +489,7 @@ function tourSteps(){
       {target:'.tb-nav', mission:'STAGE', title:'② 画面は3つ',
        text:'<span class="k">DASHBOARD</span>＝全体ながめる ／ <span class="k">INCIDENTS</span>＝一覧と起票 ／ <span class="k">REPORT</span>＝レポート。<br>ここでパッと切り替えてね。'},
       {view:'incidents', target:'#btn-new', mission:'DEPLOY', title:'③ 困ったらここから起票！',
-       text:'トラブルが来たら <span class="k">＋ 新規起票</span> をポチッ。<br>扱うのは3種類 ── <span class="k">インシデント</span>(障害)・<span class="k">サービス要求</span>(定型の依頼)・<span class="k">問題</span>(根本原因)。<br>優先度は <span class="k">影響度×緊急度</span> で勝手に決まるから安心して👍'},
+       text:'トラブルが来たら <span class="k">＋ 新規起票</span> をポチッ。<br>扱うのは4種類 ── <span class="k">問合せ(インシデント)</span>・<span class="k">リクエスト</span>(依頼)・<span class="k">計画・idea</span>(改善案)・<span class="k">その他</span>。<br>迷ったら「問合せ」でOK。優先度は <span class="k">影響度×緊急度</span> で勝手に決まるから安心して👍'},
       {view:'incidents', target:'#f-type', mission:'SCAN', title:'④ 探すのもカンタン',
        text:'種別・優先度・状態・分類・<span class="k">問い合わせ経路</span>で、過去のチケットをサクッと絞り込めるよ🔍'},
       {target:null, mission:'COMMAND', title:'⑤ 対応はクリックから',

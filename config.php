@@ -60,9 +60,10 @@ $INC_SEED_USERS = [
 
 // ===== レコード種別（ITIL 4 の3プラクティス） =====
 $INC_TYPES = [
-    'incident' => ['label' => 'インシデント', 'short' => 'INC', 'icon' => '⚠', 'desc' => '計画外のサービス中断・品質低下（迅速な復旧が目的）'],
-    'request'  => ['label' => 'サービス要求', 'short' => 'REQ', 'icon' => '✉', 'desc' => 'アカウント・権限・機器など定型サービスの要求'],
-    'problem'  => ['label' => '問題',         'short' => 'PRB', 'icon' => '🧩', 'desc' => '複数インシデントの根本原因（再発防止が目的）'],
+    'incident' => ['label' => '問合せ（インシデント）', 'short' => 'INC',  'icon' => '⚠',  'desc' => 'ITの困りごと・トラブル・質問（早く解決するのが目的）'],
+    'request'  => ['label' => 'リクエスト',             'short' => 'REQ',  'icon' => '✉',  'desc' => 'アカウント・権限・機器など、ITへの依頼'],
+    'problem'  => ['label' => '計画・idea',             'short' => 'IDEA', 'icon' => '💡', 'desc' => '改善提案・やりたい計画・アイデア'],
+    'other'    => ['label' => 'その他',                 'short' => 'OTH',  'icon' => '📌', 'desc' => '上のどれにも当てはまらないもの'],
 ];
 
 // ===== 影響度 × 緊急度 → 優先度（ITIL 標準マトリクス P1–P5） =====

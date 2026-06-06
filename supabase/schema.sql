@@ -56,11 +56,11 @@ create index if not exists idx_inc_type    on public.incidents(type);
 create index if not exists idx_inc_created on public.incidents(created_at);
 create index if not exists idx_evt_inc     on public.events(incident_id);
 
--- ---------- コード採番 INC/REQ/PRB-YYYY-NNNN ----------
+-- ---------- コード採番 INC/REQ/IDEA/OTH-YYYY-NNNN ----------
 create or replace function public.next_code(p_type text)
 returns text language plpgsql as $$
 declare
-  pfx text := case p_type when 'request' then 'REQ' when 'problem' then 'PRB' else 'INC' end
+  pfx text := case p_type when 'request' then 'REQ' when 'problem' then 'IDEA' when 'other' then 'OTH' else 'INC' end
               || '-' || to_char(now() at time zone 'Asia/Tokyo','YYYY') || '-';
   n int;
 begin
