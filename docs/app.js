@@ -162,6 +162,7 @@ async function api(action, params={}){
         reporter:params.reporter||'', assignee:params.assignee||'', fcr:!!(+params.fcr),
         csat:(params.csat===''||params.csat==null)?null:+params.csat, workaround:params.workaround||'',
         root_cause:params.root_cause||'', known_error:!!(+params.known_error), linked:params.linked||'',
+        received_at:params.received_at||null, notify:params.notify===undefined?true:!!(+params.notify),
         created_by:State.user.display_name };
       const {data,error}=await sb.from('incidents').insert(ins).select('id,code').single();
       if(error) throw new Error(error.message);
@@ -183,6 +184,8 @@ async function api(action, params={}){
       if(params.fcr!==undefined){ const v=!!(+params.fcr); if(v!==cur.fcr) set.fcr=v; }
       if(params.known_error!==undefined){ const v=!!(+params.known_error); if(v!==cur.known_error) set.known_error=v; }
       if(params.csat!==undefined){ const v=(params.csat===''||params.csat==null)?null:+params.csat; if(v!==cur.csat) set.csat=v; }
+      if(params.received_at!==undefined){ const nv=params.received_at?new Date(params.received_at).getTime():null; const ov=cur.received_at?new Date(cur.received_at).getTime():null;
+        if(nv!==ov){ set.received_at=params.received_at||null; changes.push('受付日時 → '+(params.received_at?fmt(params.received_at):'—')); } }
       if(params.status && META.statuses[params.status] && params.status!==cur.status){
         set.status=params.status; changes.push(`ステータス ${META.statuses[cur.status]} → ${META.statuses[params.status]}`); }
       if(Object.keys(set).length){ const {error:ue}=await sb.from('incidents').update(set).eq('id',params.id); if(ue) throw new Error(ue.message); }
@@ -285,6 +288,9 @@ function fmt(iso, withTime=true){ if(!iso) return '—'; const d=new Date(iso), 
 function ago(iso){ if(!iso) return ''; const s=(Date.now()-new Date(iso).getTime())/1000;
   if(s<60) return '今'; if(s<3600) return Math.floor(s/60)+'分前'; if(s<86400) return Math.floor(s/3600)+'時間前'; return Math.floor(s/86400)+'日前'; }
 function dur(sec){ if(sec==null) return '—'; if(sec<3600) return Math.round(sec/60)+'分'; if(sec<86400) return (sec/3600).toFixed(1)+'時間'; return (sec/86400).toFixed(1)+'日'; }
+// datetime-local 入力用（ローカルタイム "YYYY-MM-DDTHH:MM"）
+function toLocalInput(iso){ const d=iso?new Date(iso):new Date(); const p=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; }
 
 const M = ()=>State.meta;
 const prioBadge = p => `<span class="badge prio-${p}">${p}</span>`;
@@ -440,8 +446,9 @@ async function openIncident(id){
     <div class="prio-preview">→ 優先度 <span id="e-prio">${prioBadge(i.priority)}</span> <span class="t-meta">（影響度×緊急度で自動決定）</span></div>
     <div class="form-2"><div class="form-row"><label>ステータス</label><select class="inp" id="e-status">${opts(m.statuses,i.status)}</select></div>
       <div class="form-row ac-host"><label>担当</label><input class="inp" id="e-assignee" value="${esc(i.assignee||'')}" placeholder="氏名・部署で検索"></div></div>
+    <div class="form-row"><label>受付日時 / 問い合わせ・依頼があった日時</label><input class="inp" type="datetime-local" id="e-received" value="${i.received_at?toLocalInput(i.received_at):''}"></div>
     <div class="form-2"><div class="form-row"><label>一次解決(FCR)</label><label class="chk"><input type="checkbox" id="e-fcr" ${i.fcr?'checked':''}> 初回対応で解決した</label></div>
-      <div class="form-row"><label>満足度(CSAT)</label><select class="inp" id="e-csat"><option value="">未評価</option>${[5,4,3,2,1].map(n=>`<option value="${n}" ${String(i.csat)===String(n)?'selected':''}>${'★'.repeat(n)}（${n}）</option>`).join('')}</select></div></div>
+      <div class="form-row"><label>満足度(CSAT)</label><select class="inp" id="e-csat"><option value="">未評価</option>${[[5,'大変満足'],[4,'満足'],[3,'普通'],[2,'やや不満'],[1,'不満']].map(([n,t])=>`<option value="${n}" ${String(i.csat)===String(n)?'selected':''}>${'★'.repeat(n)}（${n}）${t}</option>`).join('')}</select></div></div>
     ${isProblem?`<div class="form-row"><label>ワークアラウンド（暫定対応）</label><textarea class="inp" id="e-wa">${esc(i.workaround||'')}</textarea></div>
       <div class="form-row"><label>根本原因</label><textarea class="inp" id="e-rc">${esc(i.root_cause||'')}</textarea></div>
       <div class="form-row"><label class="chk"><input type="checkbox" id="e-ke" ${i.known_error?'checked':''}> 既知のエラーとして登録</label></div>`:''}
@@ -457,6 +464,7 @@ async function openIncident(id){
      <div class="kv">
        <span class="k">影響度 × 緊急度</span><span class="v">${esc(m.impact[i.impact])} × ${esc(m.urgency[i.urgency])} → <b>${esc(m.priorities[i.priority].label)}</b></span>
        <span class="k">問い合わせ経路</span><span class="v">${esc(m.channels[i.channel]||'—')}</span>
+       <span class="k">受付日時</span><span class="v">${esc(i.received_at?fmt(i.received_at):'—')}</span>
        <span class="k">影響範囲</span><span class="v">${esc(i.affected||'—')}</span>
        <span class="k">申告/要求者</span><span class="v">${esc(i.reporter||'—')}</span>
        <span class="k">担当</span><span class="v">${esc(i.assignee||'未割当')}</span>
@@ -480,7 +488,8 @@ async function openIncident(id){
     $('#e-impact').onchange=upd; $('#e-urgency').onchange=upd; attachEmpAutocomplete($('#e-assignee'), ()=>State.assignees); initLinkPicker('e-linkpick', i.linked, i.code);
     $('#e-save').onclick=async()=>{
       const p={ id, impact:$('#e-impact').value, urgency:$('#e-urgency').value, status:$('#e-status').value,
-        assignee:$('#e-assignee').value.trim(), fcr:$('#e-fcr').checked?1:0, csat:$('#e-csat').value, linked:($('#e-linkpick')._getLinked?.()||''), note:$('#e-note').value.trim() };
+        assignee:$('#e-assignee').value.trim(), fcr:$('#e-fcr').checked?1:0, csat:$('#e-csat').value, linked:($('#e-linkpick')._getLinked?.()||''), note:$('#e-note').value.trim(),
+        received_at:$('#e-received').value?new Date($('#e-received').value).toISOString():'' };
       if(isProblem){ p.workaround=$('#e-wa').value.trim(); p.root_cause=$('#e-rc').value.trim(); p.known_error=$('#e-ke').checked?1:0; }
       try{ await api('update',p); toast(i.code+' を更新','ok'); closeDrawer(); refresh(); }catch(err){ toast(err.message,'bad'); } };
     $('#e-comment').onclick=async()=>{ const b=$('#e-note').value.trim(); if(!b) return toast('コメントを入力してください','bad');
@@ -511,10 +520,12 @@ function openNew(){
      <div class="prio-preview">→ 優先度 <span id="n-prio">${prioBadge('P3')}</span> <span class="t-meta">（影響度×緊急度で自動決定）</span></div>
      <div class="form-2"><div class="form-row"><label>分類</label><select class="inp" id="n-cat">${opts(m.categories,'')}</select></div>
        <div class="form-row"><label>問い合わせ経路</label><select class="inp" id="n-channel"><option value="">—</option>${opts(m.channels,'phone')}</select></div></div>
-     <div class="form-2"><div class="form-row"><label>初期ステータス</label><select class="inp" id="n-status">${opts(m.statuses,'NEW')}</select></div>
-       <div class="form-row ac-host"><label>担当</label><input class="inp" id="n-assignee" placeholder="氏名・部署で検索（任意）"></div></div>
-     <div class="form-2"><div class="form-row"><label>影響範囲 / システム</label><input class="inp" id="n-affected" placeholder="例: 本社7F / メールサーバー"></div>
+     <div class="form-2"><div class="form-row"><label>受付日時 / いつ問い合わせ・依頼があったか <span class="req">必須</span></label><input class="inp" type="datetime-local" id="n-received"></div>
+       <div class="form-row"><label>初期ステータス</label><select class="inp" id="n-status">${opts(m.statuses,'NEW')}</select></div></div>
+     <div class="form-2"><div class="form-row ac-host"><label>担当 <span class="req">必須</span></label><input class="inp" id="n-assignee" placeholder="氏名・部署で検索"></div>
        <div class="form-row ac-host"><label id="n-replbl">申告者 / 要求者</label><input class="inp" id="n-reporter" placeholder="氏名・部署で検索（自由入力も可）"></div></div>
+     <div class="form-row"><label>影響範囲 / システム</label><input class="inp" id="n-affected" placeholder="例: 本社7F全体 / 営業部 / メールサーバー / 勤怠システム">
+       <div class="type-help">どの<b>場所・部署・機器・システム</b>に影響が出ているかを書きます。例：「本社7F全体」「経理課のPC1台」「メールが全社で使えない」「Salesforceにログインできない」。分からなければ空欄でOK。</div></div>
      <div id="n-prob" class="hide">
        <div class="form-row"><label>ワークアラウンド（暫定対応）</label><textarea class="inp" id="n-wa" placeholder="暫定的な回避策…"></textarea></div>
        <div class="form-row"><label>根本原因</label><textarea class="inp" id="n-rc" placeholder="判明していれば…"></textarea></div>
@@ -522,18 +533,23 @@ function openNew(){
      <div class="form-row"><label>関連チケット（過去・対応中のチケットから選択／任意）</label><div class="lk-pick" id="n-linkpick"></div></div>
      <div class="form-row"><label>詳細 / DESCRIPTION</label><textarea class="inp" id="n-desc" placeholder="事象・発生日時・再現条件・初動…"></textarea></div>
      <label class="chk"><input type="checkbox" id="n-fcr"> 初回対応で解決済み（FCR）</label>
+     <label class="chk"><input type="checkbox" id="n-notify" checked> 起票時に通知する（村野・竹内・長谷部・加藤へメール＋Slack #ベステラit_working）</label>
    </div>
    <div class="dr-foot"><button class="btn-ok" id="n-save">▶ 起票する</button></div>`);
   const refreshType=()=>{ const t=$('#n-type').value; $('#n-typehelp').innerHTML=typeHelpHtml(t);
     $('#n-prob').classList.add('hide'); $('#n-replbl').textContent= t==='request'?'依頼者':(t==='problem'?'起案者':'申告者'); };
   const upd=()=>{ $('#n-prio').innerHTML=prioBadge(calcPriority($('#n-impact').value,$('#n-urgency').value)); };
   $('#n-type').onchange=refreshType; $('#n-impact').onchange=upd; $('#n-urgency').onchange=upd;
+  $('#n-received').value=toLocalInput();
   refreshType(); attachEmpAutocomplete($('#n-reporter')); attachEmpAutocomplete($('#n-assignee'), ()=>State.assignees); initLinkPicker('n-linkpick','',''); $('#n-title').focus();
   $('#n-save').onclick=async()=>{
     const title=$('#n-title').value.trim(); if(!title) return toast('件名は必須です','bad');
+    const assignee=$('#n-assignee').value.trim(); if(!assignee) return toast('担当は必須です','bad');
+    const recv=$('#n-received').value; if(!recv) return toast('受付日時は必須です','bad');
     const p={ type:$('#n-type').value, title, impact:$('#n-impact').value, urgency:$('#n-urgency').value,
       category:$('#n-cat').value, channel:$('#n-channel').value, status:$('#n-status').value,
-      assignee:$('#n-assignee').value.trim(), affected:$('#n-affected').value.trim(), reporter:$('#n-reporter').value.trim(),
+      assignee, affected:$('#n-affected').value.trim(), reporter:$('#n-reporter').value.trim(),
+      received_at:new Date(recv).toISOString(), notify:$('#n-notify').checked?1:0,
       linked:($('#n-linkpick')._getLinked?.()||''), description:$('#n-desc').value.trim(), fcr:$('#n-fcr').checked?1:0 };
     if($('#n-type').value==='problem'){ p.workaround=$('#n-wa').value.trim(); p.root_cause=$('#n-rc').value.trim(); p.known_error=$('#n-ke').checked?1:0; }
     try{ const j=await api('create',p); toast('起票完了 — '+j.code,'ok'); closeDrawer(); refresh(); }catch(err){ toast(err.message,'bad'); }

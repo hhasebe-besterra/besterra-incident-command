@@ -23,6 +23,7 @@ function inc_notify(string $event, array $t, string $actor, string $detail = '')
     $lines[] = "*<{$url}|{$code}>* {$t['title']}";
     $lines[] = "{$prioEmoji[$pri]} {$priLabel}  ｜  状態: {$stLabel}  ｜  分類: {$catLabel}" . ($chLabel ? "  ｜  経路: {$chLabel}" : '');
     if (!empty($t['assignee'])) $lines[] = "担当: {$t['assignee']}";
+    if (!empty($t['received_at'])) $lines[] = "受付: " . (new DateTime($t['received_at'], new DateTimeZone(INC_TZ)))->format('Y/m/d H:i');
     if ($detail !== '') $lines[] = "› {$detail}";
     $lines[] = "_操作: {$actor} ・ " . (new DateTime('now', new DateTimeZone(INC_TZ)))->format('Y/m/d H:i') . "_";
     $text = implode("\n", $lines);

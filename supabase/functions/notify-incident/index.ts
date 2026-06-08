@@ -25,6 +25,8 @@ const emailTo = (Deno.env.get("NOTIFY_EMAIL_TO") || DEFAULT_TO.join(",")).split(
 
 function decideEvent(body: any): {send:boolean; kind:string} {
   const t = body?.type, rec = body?.record || {}, old = body?.old_record || {};
+  // 起票時に「通知する」のチェックを外した場合は一切通知しない
+  if (rec.notify === false) return { send:false, kind:"" };
   if (t === "INSERT") {
     if (CLOSED.includes(rec.status)) return { send:true, kind: rec.status==="CANCELLED" ? "起票即中止" : "起票即クローズ" };
     return { send:true, kind:"新規起票" };
@@ -36,6 +38,11 @@ function decideEvent(body: any): {send:boolean; kind:string} {
   return { send:false, kind:"" };
 }
 
+function fmtDt(s:any): string {
+  if (!s) return "-";
+  try { return new Date(s).toLocaleString("ja-JP", { timeZone:"Asia/Tokyo", year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" }); }
+  catch { return String(s); }
+}
 function buildText(kind:string, r:any): {subject:string; text:string; html:string} {
   const code = r.code || "(採番待ち)";
   const subject = `【ITサービスデスク/${kind}】${code} ${r.title || ""}`.trim();
@@ -47,6 +54,7 @@ function buildText(kind:string, r:any): {subject:string; text:string; html:strin
     ["優先度", PRI[r.priority] || r.priority || "-"],
     ["状態", STATUS[r.status] || r.status || "-"],
     ["分類", r.category || "-"],
+    ["受付日時", fmtDt(r.received_at)],
     ["申告/要求者", r.reporter || "-"],
     ["担当", r.assignee || "未割当"],
     ["影響範囲", r.affected || "-"],

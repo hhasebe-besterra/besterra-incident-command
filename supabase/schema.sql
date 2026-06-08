@@ -37,6 +37,8 @@ create table if not exists public.incidents (
   known_error boolean not null default false,
   linked      text,
   created_by  text not null,
+  received_at timestamptz,
+  notify      boolean not null default true,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now(),
   resolved_at timestamptz

@@ -57,10 +57,18 @@ function inc_init_schema(PDO $pdo): void {
         known_error INTEGER NOT NULL DEFAULT 0,
         linked TEXT,
         created_by TEXT NOT NULL,
+        received_at TEXT,
+        notify INTEGER NOT NULL DEFAULT 1,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
         resolved_at TEXT
     )");
+
+    // 既存DBへのマイグレーション（カラムが無ければ追加）
+    $cols = [];
+    foreach ($pdo->query("PRAGMA table_info(incidents)") as $r) { $cols[$r['name']] = true; }
+    if (!isset($cols['received_at'])) $pdo->exec("ALTER TABLE incidents ADD COLUMN received_at TEXT");
+    if (!isset($cols['notify']))      $pdo->exec("ALTER TABLE incidents ADD COLUMN notify INTEGER NOT NULL DEFAULT 1");
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS events (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
