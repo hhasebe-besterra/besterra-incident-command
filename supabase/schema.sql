@@ -38,6 +38,7 @@ create table if not exists public.incidents (
   linked      text,
   created_by  text not null,
   received_at timestamptz,
+  due_date    date,
   notify      boolean not null default true,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now(),

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=10">
+<link rel="stylesheet" href="app.css?v=11">
 </head>
 <body class="booting">
 
@@ -64,6 +64,7 @@
     <div class="tb-right">
       <span class="clock" id="clock">--:--:--</span>
       <span class="who" id="who"></span>
+      <button class="ico-btn" id="btn-theme" title="明るい/暗い表示を切替">☀</button>
       <button class="ico-btn" id="btn-help" title="チュートリアルをもう一度">❓</button>
       <button class="ico-btn" id="btn-pw" title="パスワード変更">⚙</button>
       <button class="ico-btn danger" id="btn-logout" title="ログアウト">⏻</button>
@@ -130,6 +131,6 @@
 <!-- トースト -->
 <div class="toasts" id="toasts"></div>
 
-<script src="app.js?v=10"></script>
+<script src="app.js?v=11"></script>
 </body>
 </html>

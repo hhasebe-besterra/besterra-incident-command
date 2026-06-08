@@ -266,12 +266,14 @@ function incTable(list){
       <td class="c-chip">${typeChip(i.type)}</td>
       <td class="c-chip">${prioBadge(i.priority)}</td>
       <td class="c-chip">${statusChip(i.status)}</td>
+      <td class="t-meta c-kv" data-label="問合日">${i.received_at?esc(fmt(i.received_at,false)):'—'}</td>
+      <td class="t-meta c-kv" data-label="申請者">${esc(i.reporter||'—')}</td>
       <td class="c-title"><div class="t-title">${esc(i.title)}</div>
           <div class="t-meta">${esc(M().categories[i.category]||i.category)}${i.affected?' · '+esc(i.affected):''} ${slaTag(i)}</div></td>
       <td class="t-meta c-kv" data-label="担当">${esc(i.assignee||'未割当')}</td>
-      <td class="t-meta c-kv" data-label="更新" title="${esc(fmt(i.updated_at))}">${ago(i.updated_at)}</td>
+      <td class="t-meta c-kv" data-label="最終更新日時" title="${esc(ago(i.updated_at))}">${esc(fmt(i.updated_at))}</td>
     </tr>`).join('');
-  return `<table class="inc"><thead><tr><th>CODE</th><th>種別</th><th>優先</th><th>状態</th><th>件名 / 分類</th><th>担当</th><th>更新</th></tr></thead><tbody>${rows}</tbody></table>`;
+  return `<table class="inc"><thead><tr><th>CODE</th><th>種別</th><th>優先</th><th>状態</th><th>問合日</th><th>申請者</th><th>件名 / 分類</th><th>担当</th><th>最終更新日時</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 function bindRows(scope){ $$(`${scope} tr[data-id]`).forEach(tr=>tr.onclick=()=>openIncident(+tr.dataset.id)); }
 async function loadIncidents(){
@@ -313,7 +315,8 @@ async function openIncident(id){
       <div class="form-row"><label>ステータス</label><select class="inp" id="e-status">${opts(m.statuses,i.status)}</select></div>
       <div class="form-row ac-host"><label>担当</label><input class="inp" id="e-assignee" value="${esc(i.assignee||'')}" placeholder="氏名・部署で検索"></div>
     </div>
-    <div class="form-row"><label>受付日時 / 問い合わせ・依頼があった日時</label><input class="inp" type="datetime-local" id="e-received" value="${i.received_at?toLocalInput(i.received_at):''}"></div>
+    <div class="form-2"><div class="form-row"><label>受付日時 / 問い合わせ・依頼があった日時</label><input class="inp" type="datetime-local" id="e-received" value="${i.received_at?toLocalInput(i.received_at):''}"></div>
+      <div class="form-row"><label>クローズ予定日 / いつまでに完了させるか</label><input class="inp" type="date" id="e-due" value="${esc(i.due_date||'')}"></div></div>
     <div class="form-2">
       <div class="form-row"><label>一次解決(FCR)</label><label class="chk"><input type="checkbox" id="e-fcr" ${i.fcr==1?'checked':''}> 初回対応で解決した</label></div>
       <div class="form-row"><label>満足度(CSAT)</label><select class="inp" id="e-csat">
@@ -337,6 +340,7 @@ async function openIncident(id){
        <span class="k">影響度 × 緊急度</span><span class="v">${esc(m.impact[i.impact])} × ${esc(m.urgency[i.urgency])} → <b>${esc(m.priorities[i.priority].label)}</b></span>
        <span class="k">問い合わせ経路</span><span class="v">${esc(m.channels[i.channel]||'—')}</span>
        <span class="k">受付日時</span><span class="v">${esc(i.received_at?fmt(i.received_at):'—')}</span>
+       <span class="k">クローズ予定日</span><span class="v">${esc(i.due_date||'—')}</span>
        <span class="k">影響範囲</span><span class="v">${esc(i.affected||'—')}</span>
        <span class="k">申告/要求者</span><span class="v">${esc(i.reporter||'—')}</span>
        <span class="k">担当</span><span class="v">${esc(i.assignee||'未割当')}</span>
@@ -366,7 +370,7 @@ async function openIncident(id){
     $('#e-save').onclick=async()=>{
       const p={ id, impact:$('#e-impact').value, urgency:$('#e-urgency').value, status:$('#e-status').value,
         assignee:$('#e-assignee').value.trim(), fcr:$('#e-fcr').checked?1:0, csat:$('#e-csat').value,
-        received_at:$('#e-received').value?new Date($('#e-received').value).toISOString():'',
+        received_at:$('#e-received').value?new Date($('#e-received').value).toISOString():'', due_date:$('#e-due').value||'',
         linked:($('#e-linkpick')._getLinked?.()||''), note:$('#e-note').value.trim() };
       if(isProblem){ p.workaround=$('#e-wa').value.trim(); p.root_cause=$('#e-rc').value.trim(); p.known_error=$('#e-ke').checked?1:0; }
       try{ await api('update',p); toast(i.code+' を更新','ok'); closeDrawer(); refresh(); }catch(err){ toast(err.message,'bad'); }
@@ -412,6 +416,8 @@ function openNew(){
        <div class="form-row"><label>受付日時 / いつ問い合わせ・依頼があったか <span class="req">必須</span></label><input class="inp" type="datetime-local" id="n-received"></div>
        <div class="form-row"><label>初期ステータス</label><select class="inp" id="n-status">${opts(m.statuses,'NEW')}</select></div>
      </div>
+     <div class="form-row"><label>クローズ予定日 / いつまでに完了させるか（任意）</label><input class="inp" type="date" id="n-due">
+       <div class="type-help">この件を<b>いつまでにクローズ（完了）する予定か</b>の目標日です。緊急度の目安 → <b>高＝即時</b>／<b>中＝1〜3日</b>／<b>低＝任意</b>。分からなければ空欄でOK。</div></div>
      <div class="form-2">
        <div class="form-row ac-host"><label>担当 <span class="req">必須</span></label><input class="inp" id="n-assignee" placeholder="氏名・部署で検索"></div>
        <div class="form-row ac-host"><label id="n-replbl">申告者 / 要求者</label><input class="inp" id="n-reporter" placeholder="氏名・部署で検索（自由入力も可）"></div>
@@ -446,7 +452,7 @@ function openNew(){
     const p={ type:$('#n-type').value, title, impact:$('#n-impact').value, urgency:$('#n-urgency').value,
       category:$('#n-cat').value, channel:$('#n-channel').value, status:$('#n-status').value,
       assignee, affected:$('#n-affected').value.trim(), reporter:$('#n-reporter').value.trim(),
-      received_at:new Date(recv).toISOString(), notify:$('#n-notify').checked?1:0,
+      received_at:new Date(recv).toISOString(), due_date:$('#n-due').value||'', notify:$('#n-notify').checked?1:0,
       linked:($('#n-linkpick')._getLinked?.()||''), description:$('#n-desc').value.trim(), fcr:$('#n-fcr').checked?1:0 };
     if($('#n-type').value==='problem'){ p.workaround=$('#n-wa').value.trim(); p.root_cause=$('#n-rc').value.trim(); p.known_error=$('#n-ke').checked?1:0; }
     try{ const j=await api('create',p); toast('起票完了 — '+j.code,'ok'); closeDrawer(); refresh(); }catch(err){ toast(err.message,'bad'); }
@@ -611,7 +617,23 @@ function startTutorial(force){
 }
 
 /* ============================================================ INIT */
+/* ============================================================ THEME（明/暗） */
+function applyTheme(t){
+  const light = t==='light';
+  document.body.classList.toggle('light', light);
+  const b=$('#btn-theme'); if(b){ b.textContent=light?'🌙':'☀'; b.title=light?'暗い表示に切替':'明るい表示に切替'; }
+}
+function initTheme(){
+  let t='dark'; try{ t=localStorage.getItem('inc-theme')||'dark'; }catch(e){}
+  applyTheme(t);
+  const b=$('#btn-theme'); if(b) b.onclick=()=>{
+    const next=document.body.classList.contains('light')?'dark':'light';
+    try{ localStorage.setItem('inc-theme',next); }catch(e){} applyTheme(next);
+  };
+}
+
 (async function init(){
+  initTheme();
   matrix(); clock(); initLogin(); bootSeq();
   try{ State.meta=await api('meta',{},'GET'); const me=await api('me',{},'GET');
     if(me.user){ State.user=me.user; enterApp(); } }catch(e){}

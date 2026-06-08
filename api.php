@@ -120,9 +120,9 @@ try {
         $notify = array_key_exists('notify', $req) ? (!empty($req['notify'])?1:0) : 1;
         $st = $pdo->prepare("INSERT INTO incidents
             (code,type,title,description,category,impact,urgency,priority,status,channel,affected,reporter,assignee,
-             fcr,csat,workaround,root_cause,known_error,linked,created_by,received_at,notify,created_at,updated_at,resolved_at)
+             fcr,csat,workaround,root_cause,known_error,linked,created_by,received_at,due_date,notify,created_at,updated_at,resolved_at)
             VALUES (:code,:type,:title,:desc,:cat,:imp,:urg,:pri,:status,:ch,:aff,:rep,:asg,
-             :fcr,:csat,:wa,:rc,:ke,:lnk,:by,:recv,:notify,:ca,:ua,:ra)");
+             :fcr,:csat,:wa,:rc,:ke,:lnk,:by,:recv,:due,:notify,:ca,:ua,:ra)");
         $st->execute([
             ':code'=>$code, ':type'=>$type, ':title'=>$title, ':desc'=>trim((string)($req['description'] ?? '')),
             ':cat'=>$cat, ':imp'=>$impact, ':urg'=>$urgency, ':pri'=>$priority, ':status'=>$status, ':ch'=>$channel,
@@ -131,7 +131,8 @@ try {
             ':fcr'=>!empty($req['fcr'])?1:0, ':csat'=>($req['csat'] ?? '')!=='' ? (int)$req['csat'] : null,
             ':wa'=>trim((string)($req['workaround'] ?? '')), ':rc'=>trim((string)($req['root_cause'] ?? '')),
             ':ke'=>!empty($req['known_error'])?1:0, ':lnk'=>trim((string)($req['linked'] ?? '')),
-            ':by'=>$u['display_name'], ':recv'=>trim((string)($req['received_at'] ?? '')) ?: null, ':notify'=>$notify,
+            ':by'=>$u['display_name'], ':recv'=>trim((string)($req['received_at'] ?? '')) ?: null,
+            ':due'=>trim((string)($req['due_date'] ?? '')) ?: null, ':notify'=>$notify,
             ':ca'=>$now, ':ua'=>$now, ':ra'=>$resolved_at,
         ]);
         $id = (int)$pdo->lastInsertId();
@@ -169,6 +170,8 @@ try {
         if (array_key_exists('received_at', $req)) { $v = trim((string)$req['received_at']) ?: null;
             $a = $v ? strtotime($v) : null; $b = $cur['received_at'] ? strtotime((string)$cur['received_at']) : null;
             if ($a !== $b) { $set[]="received_at = ?"; $args[]=$v; $changes[]="受付日時 → ".($v ?: '—'); } }
+        if (array_key_exists('due_date', $req)) { $v = trim((string)$req['due_date']) ?: null;
+            if ((string)$v !== (string)$cur['due_date']) { $set[]="due_date = ?"; $args[]=$v; $changes[]="クローズ予定日 → ".($v ?: '—'); } }
         // status
         if (isset($req['status']) && isset($INC_STATUSES[$req['status']]) && $req['status'] !== $cur['status']) {
             $new = $req['status']; $set[]="status = ?"; $args[]=$new;

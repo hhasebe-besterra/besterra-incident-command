@@ -58,6 +58,7 @@ function inc_init_schema(PDO $pdo): void {
         linked TEXT,
         created_by TEXT NOT NULL,
         received_at TEXT,
+        due_date TEXT,
         notify INTEGER NOT NULL DEFAULT 1,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
@@ -68,6 +69,7 @@ function inc_init_schema(PDO $pdo): void {
     $cols = [];
     foreach ($pdo->query("PRAGMA table_info(incidents)") as $r) { $cols[$r['name']] = true; }
     if (!isset($cols['received_at'])) $pdo->exec("ALTER TABLE incidents ADD COLUMN received_at TEXT");
+    if (!isset($cols['due_date']))    $pdo->exec("ALTER TABLE incidents ADD COLUMN due_date TEXT");
     if (!isset($cols['notify']))      $pdo->exec("ALTER TABLE incidents ADD COLUMN notify INTEGER NOT NULL DEFAULT 1");
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS events (
