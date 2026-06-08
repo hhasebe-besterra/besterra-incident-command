@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=8">
+<link rel="stylesheet" href="style.css?v=9">
 </head>
 <body class="booting">
 
@@ -78,7 +78,7 @@
     <div class="toolbar">
       <button class="btn-jack" id="btn-new">＋ 新規起票</button>
       <input type="search" id="f-q" class="inp" placeholder="検索 / SEARCH (件名・本文・コード)">
-      <select id="f-scope" class="inp"><option value="">全件</option><option value="open" selected>未解決のみ</option></select>
+      <select id="f-scope" class="inp"><option value="" selected>全件</option><option value="open">未解決のみ</option></select>
       <select id="f-type" class="inp"><option value="">種別: 全て</option></select>
       <select id="f-priority" class="inp"><option value="">優先度: 全て</option></select>
       <select id="f-status" class="inp"><option value="">状態: 全て</option></select>
@@ -106,7 +106,7 @@
 <div class="toasts" id="toasts"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js?v=8"></script>
-<script src="app.js?v=8"></script>
+<script src="config.js?v=9"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>

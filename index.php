@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=13">
+<link rel="stylesheet" href="app.css?v=14">
 </head>
 <body class="booting">
 
@@ -89,8 +89,8 @@
       <button class="btn-jack" id="btn-new">＋ 新規起票</button>
       <input type="search" id="f-q" class="inp" placeholder="検索 / SEARCH (件名・本文・コード)">
       <select id="f-scope" class="inp">
-        <option value="">全件</option>
-        <option value="open" selected>未解決のみ</option>
+        <option value="" selected>全件</option>
+        <option value="open">未解決のみ</option>
       </select>
       <select id="f-type" class="inp"><option value="">種別: 全て</option></select>
       <select id="f-priority" class="inp"><option value="">優先度: 全て</option></select>
@@ -132,6 +132,6 @@
 <!-- トースト -->
 <div class="toasts" id="toasts"></div>
 
-<script src="app.js?v=13"></script>
+<script src="app.js?v=14"></script>
 </body>
 </html>
