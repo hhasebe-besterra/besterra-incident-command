@@ -387,9 +387,16 @@ table.rep th{color:var(--dim);font-size:10px;letter-spacing:1px}
 
 /* ---- レスポンシブ ---- */
 @media(max-width:760px){
+  /* --- スマホ：上部バーを2段組みにして横はみ出しを解消 --- */
+  .topbar{flex-wrap:wrap;gap:6px 8px;padding:8px 10px}
+  .tb-left{min-width:0;flex:1 1 auto;gap:7px}
+  .tb-brand{font-size:12px;letter-spacing:1px}
+  .std-badge{display:none}
   .tb-tag,.who .uname{display:none}
-  .tb-nav{margin-left:0}
-  .nav-tab{padding:7px 9px;font-size:11px}
+  .clock{display:none}
+  .tb-right{margin-left:auto;gap:6px}
+  .tb-nav{order:3;flex-basis:100%;margin-left:0;gap:6px;justify-content:space-between}
+  .nav-tab{flex:1 1 0;text-align:center;padding:9px 6px;font-size:11px;letter-spacing:.5px}
   .rep-2col{grid-template-columns:1fr}
   .rep-kpis{grid-template-columns:repeat(2,1fr)}
   .form-2{grid-template-columns:1fr}
