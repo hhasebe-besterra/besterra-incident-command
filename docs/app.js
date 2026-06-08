@@ -407,9 +407,9 @@ function renderDashCards(s){
 /* ============================================================ LIST */
 function incTable(list){
   if(!list.length) return `<div class="empty">▢ 該当チケットなし — ALL CLEAR</div>`;
-  const rows=list.map(i=>`<tr data-id="${i.id}"><td class="code">${esc(i.code)}</td><td>${typeChip(i.type)}</td><td>${prioBadge(i.priority)}</td><td>${statusChip(i.status)}</td>
-      <td><div class="t-title">${esc(i.title)}</div><div class="t-meta">${esc(M().categories[i.category]||i.category)}${i.affected?' · '+esc(i.affected):''} ${slaTag(i)}</div></td>
-      <td class="t-meta">${esc(i.assignee||'未割当')}</td><td class="t-meta" title="${esc(fmt(i.updated_at))}">${ago(i.updated_at)}</td></tr>`).join('');
+  const rows=list.map(i=>`<tr data-id="${i.id}"><td class="code">${esc(i.code)}</td><td class="c-chip">${typeChip(i.type)}</td><td class="c-chip">${prioBadge(i.priority)}</td><td class="c-chip">${statusChip(i.status)}</td>
+      <td class="c-title"><div class="t-title">${esc(i.title)}</div><div class="t-meta">${esc(M().categories[i.category]||i.category)}${i.affected?' · '+esc(i.affected):''} ${slaTag(i)}</div></td>
+      <td class="t-meta c-kv" data-label="担当">${esc(i.assignee||'未割当')}</td><td class="t-meta c-kv" data-label="更新" title="${esc(fmt(i.updated_at))}">${ago(i.updated_at)}</td></tr>`).join('');
   return `<table class="inc"><thead><tr><th>CODE</th><th>種別</th><th>優先</th><th>状態</th><th>件名 / 分類</th><th>担当</th><th>更新</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 function bindRows(scope){ $$(`${scope} tr[data-id]`).forEach(tr=>tr.onclick=()=>openIncident(+tr.dataset.id)); }
