@@ -173,7 +173,10 @@ function enterApp(){
   fillSelect('#f-cat', M().categories, '分類: 全て');
   fillSelect('#f-channel', M().channels, '経路: 全て');
   $('#rep-date').value=new Date().toISOString().slice(0,10);
-  bindApp(); switchView('dashboard');
+  bindApp();
+  // ログイン後は「起票」画面を既定に（書込ロールのみ・チュートリアル初回は除く）
+  if(isWriter()){ switchView('incidents'); if(tourSeen()) setTimeout(openNew,140); }
+  else switchView('dashboard');
   api('employees',{},'GET').then(j=>{ State.employees=j.employees||[]; }).catch(()=>{});
   api('assignees',{},'GET').then(j=>{ State.assignees=j.assignees||[]; }).catch(()=>{});
   setTimeout(()=>startTutorial(false), 700);
@@ -707,8 +710,10 @@ function tourPosition(step){
   let left=r.left+r.width/2-cw/2; left=Math.max(10,Math.min(left,innerWidth-cw-10));
   card.style.left=left+'px'; card.style.top=top+'px';
 }
+function tourKey(){ return 'inc_tour_'+(State.user?State.user.username:'x')+'_v2'; }
+function tourSeen(){ try{ return !!localStorage.getItem(tourKey()); }catch(e){ return false; } }
 function startTutorial(force){
-  const key='inc_tour_'+(State.user?State.user.username:'x')+'_v2';
+  const key=tourKey();
   if(!force){ try{ if(localStorage.getItem(key)) return; }catch(e){} }
   Tour.start(tourSteps(), key);
 }

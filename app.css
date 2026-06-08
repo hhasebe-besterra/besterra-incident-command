@@ -506,6 +506,87 @@ body.light table.inc tbody tr:hover{background:rgba(47,125,138,.08)}
 body.light .card::before{box-shadow:none}
 body.light .badge,body.light .type-chip,body.light .sla-tag{box-shadow:none!important}
 
+/* ============================================================
+   MODERN UI — クリーンな今風 SaaS ダッシュボード（既定の見た目を刷新）
+   サイバーパンク演出（マトリクス/走査線/ネオン発光）を撤去しフラット化
+   ============================================================ */
+:root{
+  --bg:#0a0d12;
+  --panel:#121823; --panel2:#161d29;
+  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.15);
+  --cyan:#6ea8fe; --green:#43cf8e; --mag:#c98bdb; --gold:#e3b341;
+  --ink:#e8eef6; --dim:#98a4b5; --dimmer:#6a7686;
+  --sev1:#f76d7a; --sev2:#f0a45a; --sev3:#ddc24a; --sev4:#69b6ff;
+  --ok:#43cf8e; --warn:#e3b341; --bad:#f76d7a;
+  --glow:none;
+}
+/* 背景演出を停止してフラットなダーク地に */
+#matrix,.scanlines,.bg-grid,.vignette{display:none!important}
+body:not(.light){background:radial-gradient(130% 120% at 50% -10%,#10161f 0%,#0a0d12 58%)!important}
+/* ネオン発光・点滅をすべて除去 */
+[class]{text-shadow:none!important}
+.badge,.type-chip,.sla-tag,.nav-tab,.nav-tab.active,.std-badge,.btn-jack,.btn-ok,.btn-ghost,
+.card::before,.st .dot,.dot,.donut,.mb-fill,.kpi::before,.sev-SEV1,.badge.prio-P1,.tour-hole{box-shadow:none!important}
+.badge.prio-P1,.sev-SEV1,.sla-tag.bad,.blink,.tour-caret{animation:none!important}
+
+/* トップバー */
+.topbar{background:rgba(12,16,23,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:11px 18px;gap:16px}
+.tb-brand{letter-spacing:1px}
+.nav-tab{border-radius:9px;font-weight:600;border-color:transparent}
+.nav-tab:hover{background:rgba(255,255,255,.06);color:var(--ink);border-color:transparent}
+body:not(.light) .nav-tab.active{background:rgba(110,168,254,.16);color:#cfe0ff;border-color:transparent}
+.ico-btn{border-radius:9px;border-color:var(--line)}
+.ico-btn:hover{border-color:var(--line2);color:var(--ink);background:rgba(255,255,255,.05)}
+.std-badge{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--dim);font-weight:600}
+.std-badge:hover{border-color:var(--line2)}
+
+/* KPI ストリップ → 余白のあるカード群 */
+.statstrip{background:transparent;border-bottom:1px solid var(--line);padding:14px 18px;gap:11px;overflow-x:auto}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px;min-width:152px;border-right:1px solid var(--line)}
+.kpi:hover{border-color:var(--line2)}
+.kpi::before{left:13px;top:13px;bottom:auto;width:22px;height:3px;border-radius:2px}
+.kpi-k{font-size:10px;letter-spacing:.6px}
+.kpi-v{font-size:25px}
+
+/* パネル / カード */
+.view{padding:18px}
+.panel,.card,.dpanel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.dpanel{transition:border-color .15s ease}
+.dpanel:hover{border-color:var(--line2)}
+.panel-h{color:var(--dim);border-bottom:1px solid var(--line);font-weight:600;letter-spacing:.8px;font-size:11px;padding:12px 16px}
+.dpanel-h{color:var(--dim);border-bottom:1px solid var(--line);border-bottom-style:solid;font-weight:600;letter-spacing:.8px}
+
+/* テーブル */
+table.inc th{background:var(--panel2);color:var(--dim);border-bottom:1px solid var(--line);font-size:10.5px;letter-spacing:.6px}
+table.inc td{border-bottom:1px solid var(--line)}
+table.inc tbody tr:hover{background:rgba(110,168,254,.07)}
+.t-title{color:var(--ink);font-weight:600}
+th.srt.on .ar{color:var(--cyan)}
+
+/* バッジ類はピル型のソフトカラーに */
+.badge,.type-chip,.sla-tag{border-radius:999px;font-weight:600}
+
+/* 入力・ボタン */
+.inp{border-radius:10px;border-color:var(--line2);background:rgba(255,255,255,.04)}
+.inp:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(110,168,254,.18)}
+.btn-jack{background:var(--cyan);color:#06203f;border:none;border-radius:10px;font-weight:700;letter-spacing:.3px;text-shadow:none}
+.btn-jack:hover{background:#8bb8ff}
+.btn-ok{background:var(--green);color:#05281b;border:none;border-radius:10px;font-weight:700}
+.btn-ok:hover{background:#5fdca3}
+.btn-ghost{border-radius:10px;border-color:var(--line2)}
+.btn-ghost:hover{border-color:var(--cyan);background:rgba(110,168,254,.08)}
+.btn-del{border-radius:10px}
+
+/* ドロワー / ダイアログ */
+.drawer{background:#0e131c;border-left:1px solid var(--line)}
+.dlg-box{border-radius:16px;border-color:var(--line2)}
+.form-row label{color:var(--dim);letter-spacing:.5px}
+.prio-preview{border-radius:10px;border-style:solid}
+.type-help{border-radius:10px}
+
+/* ドーナツ中央の数字 */
+.donut-hole b{color:var(--ink)}
+
 /* ---- レスポンシブ ---- */
 @media(max-width:760px){
   /* --- スマホ：上部バーを2段組みにして横はみ出しを解消 --- */

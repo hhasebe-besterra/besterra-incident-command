@@ -347,7 +347,10 @@ function enterApp(){
   fillSelect('#f-cat', M().categories, '分類: 全て');
   fillSelect('#f-channel', M().channels, '経路: 全て');
   $('#rep-date').value=new Date().toISOString().slice(0,10);
-  bindApp(); switchView('dashboard');
+  bindApp();
+  // ログイン後は「起票」画面を既定に（書込ロールのみ・チュートリアル初回は除く）
+  if(isWriter()){ switchView('incidents'); if(tourSeen()) setTimeout(openNew,140); }
+  else switchView('dashboard');
   api('employees').then(j=>{ State.employees=j.employees||[]; }).catch(()=>{});
   api('assignees').then(j=>{ State.assignees=j.assignees||[]; }).catch(()=>{});
   setTimeout(()=>startTutorial(false), 700);
@@ -801,7 +804,9 @@ function tourPosition(step){
   if(below+chh<=innerHeight-8) top=below; else if(above>=8) top=above; else top=Math.max(8,(innerHeight-chh)/2);
   let left=r.left+r.width/2-cw/2; left=Math.max(10,Math.min(left,innerWidth-cw-10)); card.style.left=left+'px'; card.style.top=top+'px';
 }
-function startTutorial(force){ const key='inc_tour_'+(State.user?State.user.username:'x')+'_v2';
+function tourKey(){ return 'inc_tour_'+(State.user?State.user.username:'x')+'_v2'; }
+function tourSeen(){ try{ return !!localStorage.getItem(tourKey()); }catch(e){ return false; } }
+function startTutorial(force){ const key=tourKey();
   if(!force){ try{ if(localStorage.getItem(key)) return; }catch(e){} } Tour.start(tourSteps(), key); }
 
 /* ============================================================ INIT */
