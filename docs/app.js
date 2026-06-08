@@ -127,8 +127,8 @@ async function api(action, params={}){
       return {ok:true, user:p||null};
     }
     case 'users': { const {data}=await sb.from('profiles').select('username,display_name,role'); return {ok:true, users:data||[]}; }
-    case 'employees': { const r=await fetch('employees.json'); return {ok:true, employees: r.ok? await r.json():[]}; }
-    case 'assignees': { const r=await fetch('assignees.json'); return {ok:true, assignees: r.ok? await r.json():[]}; }
+    case 'employees': { const r=await fetch('employees.json?v=5'); return {ok:true, employees: r.ok? await r.json():[]}; }
+    case 'assignees': { const r=await fetch('assignees.json?v=5'); return {ok:true, assignees: r.ok? await r.json():[]}; }
 
     case 'list': {
       let qy=sb.from('incidents').select('*');
