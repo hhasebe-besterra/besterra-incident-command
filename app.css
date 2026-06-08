@@ -507,82 +507,119 @@ body.light .card::before{box-shadow:none}
 body.light .badge,body.light .type-chip,body.light .sla-tag{box-shadow:none!important}
 
 /* ============================================================
-   MODERN UI — クリーンな今風 SaaS ダッシュボード（既定の見た目を刷新）
-   サイバーパンク演出（マトリクス/走査線/ネオン発光）を撤去しフラット化
+   MARATHON CYBERPUNK — ゴリゴリのサイバーパンク（Bungie Marathon 風）
+   骨色クリーム × 漆黒 × 蛍光オレンジ／ティール。角ばったブロック・大型読み値。
+   主眼：ダッシュボードを「誰が見てもぱっと分かる」視認性に。
    ============================================================ */
 :root{
-  --bg:#0a0d12;
-  --panel:#121823; --panel2:#161d29;
-  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.15);
-  --cyan:#6ea8fe; --green:#43cf8e; --mag:#c98bdb; --gold:#e3b341;
-  --ink:#e8eef6; --dim:#98a4b5; --dimmer:#6a7686;
-  --sev1:#f76d7a; --sev2:#f0a45a; --sev3:#ddc24a; --sev4:#69b6ff;
-  --ok:#43cf8e; --warn:#e3b341; --bad:#f76d7a;
-  --glow:none;
+  --bg:#0a0a0c;
+  --panel:#121215; --panel2:#17171b;
+  --line:rgba(236,227,208,.16); --line2:rgba(236,227,208,.34);
+  --cyan:#22e3d0;            /* ティール（技術系アクセント） */
+  --orange:#ff5a1f;          /* マラソンの象徴色 */
+  --green:#37e29a; --mag:#ff5fb0; --gold:#ffc23d;
+  --ink:#efe7d6; --dim:#9d978a; --dimmer:#6e695e;
+  --sev1:#ff3b46; --sev2:#ff8a1f; --sev3:#ffc23d; --sev4:#3fb6ff;
+  --ok:#37e29a; --warn:#ffc23d; --bad:#ff3b46;
+  --glow:0 0 12px rgba(255,90,31,.40);
 }
-/* 背景演出を停止してフラットなダーク地に */
-#matrix,.scanlines,.bg-grid,.vignette{display:none!important}
-body:not(.light){background:radial-gradient(130% 120% at 50% -10%,#10161f 0%,#0a0d12 58%)!important}
-/* ネオン発光・点滅をすべて除去 */
-[class]{text-shadow:none!important}
-.badge,.type-chip,.sla-tag,.nav-tab,.nav-tab.active,.std-badge,.btn-jack,.btn-ok,.btn-ghost,
-.card::before,.st .dot,.dot,.donut,.mb-fill,.kpi::before,.sev-SEV1,.badge.prio-P1,.tour-hole{box-shadow:none!important}
-.badge.prio-P1,.sev-SEV1,.sla-tag.bad,.blink,.tour-caret{animation:none!important}
+/* 背景演出はサイバーパンクとして“あえて”復活（暗所のみ） */
+body:not(.light){background:radial-gradient(125% 110% at 50% -12%,#1b1109 0%,#0b0a0c 52%,#070708 100%)!important}
+body:not(.light) #matrix{opacity:.07}
+body:not(.light) .scanlines{opacity:.22}
+body:not(.light) .bg-grid{background:
+   linear-gradient(rgba(255,90,31,.06) 1px,transparent 1px) 0 0/100% 40px,
+   linear-gradient(90deg,rgba(255,90,31,.05) 1px,transparent 1px) 0 0/40px 100%}
+body:not(.light) .vignette{box-shadow:inset 0 0 200px rgba(0,0,0,.6)}
 
-/* トップバー */
-.topbar{background:rgba(12,16,23,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:11px 18px;gap:16px}
-.tb-brand{letter-spacing:1px}
-.nav-tab{border-radius:9px;font-weight:600;border-color:transparent}
-.nav-tab:hover{background:rgba(255,255,255,.06);color:var(--ink);border-color:transparent}
-body:not(.light) .nav-tab.active{background:rgba(110,168,254,.16);color:#cfe0ff;border-color:transparent}
-.ico-btn{border-radius:9px;border-color:var(--line)}
-.ico-btn:hover{border-color:var(--line2);color:var(--ink);background:rgba(255,255,255,.05)}
-.std-badge{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--dim);font-weight:600}
-.std-badge:hover{border-color:var(--line2)}
+/* ---- トップバー（角ばった司令室ヘッダー） ---- */
+.topbar{background:linear-gradient(180deg,rgba(20,16,12,.96),rgba(11,10,12,.92));backdrop-filter:blur(8px);
+  border-bottom:2px solid var(--orange);padding:10px 18px;gap:16px}
+.tb-brand{letter-spacing:2px;color:var(--ink)}
+.logo-mark{color:var(--orange);text-shadow:0 0 14px rgba(255,90,31,.6)}
+.nav-tab{border-radius:3px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;border:1px solid transparent;color:var(--dim)}
+.nav-tab:hover{color:var(--ink);border-color:var(--line2);background:rgba(255,90,31,.08)}
+body:not(.light) .nav-tab.active{background:var(--orange);color:#1a0700;border-color:var(--orange);box-shadow:0 0 20px rgba(255,90,31,.55)}
+.ico-btn{border-radius:3px;border-color:var(--line2)}
+.ico-btn:hover{color:var(--orange);border-color:var(--orange);background:rgba(255,90,31,.08)}
+.std-badge{background:rgba(255,90,31,.10);border:1px solid var(--orange);color:#ffb489;font-weight:700;border-radius:3px;letter-spacing:1px}
 
-/* KPI ストリップ → 余白のあるカード群 */
-.statstrip{background:transparent;border-bottom:1px solid var(--line);padding:14px 18px;gap:11px;overflow-x:auto}
-.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px;min-width:152px;border-right:1px solid var(--line)}
-.kpi:hover{border-color:var(--line2)}
-.kpi::before{left:13px;top:13px;bottom:auto;width:22px;height:3px;border-radius:2px}
-.kpi-k{font-size:10px;letter-spacing:.6px}
-.kpi-v{font-size:25px}
+/* ---- KPI（大型・色分け・一目で危険が分かる） ---- */
+.statstrip{background:linear-gradient(180deg,rgba(18,18,21,.6),transparent);border-bottom:1px solid var(--line);
+  padding:16px 18px;gap:12px;overflow-x:auto}
+.kpi{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--line2);border-radius:4px;
+  padding:13px 18px 14px;min-width:176px;flex:1}
+.kpi::before{display:none}
+.kpi-k{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;color:var(--dim)}
+.kpi-v{font-size:40px;font-weight:800;letter-spacing:-.5px;margin:2px 0 1px}
+.kpi-s{font-size:10.5px;letter-spacing:.4px}
+.kpi.cyan{border-left-color:var(--cyan)} .kpi.cyan .kpi-v{color:var(--cyan);text-shadow:0 0 16px rgba(34,227,208,.35)}
+.kpi.green{border-left-color:var(--green)} .kpi.green .kpi-v{color:var(--green);text-shadow:0 0 16px rgba(55,226,154,.3)}
+.kpi.warn{border-left-color:var(--gold);background:linear-gradient(180deg,rgba(255,194,61,.10),transparent)} .kpi.warn .kpi-v{color:var(--gold)}
+.kpi.bad{border-left-color:var(--bad);background:linear-gradient(180deg,rgba(255,59,70,.16),rgba(255,59,70,.02))}
+.kpi.bad .kpi-v{color:#ff6b73;text-shadow:0 0 18px rgba(255,59,70,.55)}
+.kpi.bad .kpi-k{color:#ff9aa0}
 
-/* パネル / カード */
+/* ---- パネル / 分析カード（角ばったブロック＋見出しブロック） ---- */
 .view{padding:18px}
-.panel,.card,.dpanel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.25)}
-.dpanel{transition:border-color .15s ease}
+.panel,.dpanel{background:linear-gradient(180deg,rgba(20,20,24,.96),rgba(15,15,18,.96));
+  border:1px solid var(--line);border-radius:5px;box-shadow:0 0 0 1px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35)}
+.dpanel{padding:0;overflow:hidden}
+.dpanel .dpanel-h{margin:0;padding:11px 15px}
+.dpanel>*:not(.dpanel-h){padding-left:15px;padding-right:15px}
+.dpanel>.dpanel-h + *{padding-top:15px}
+.dpanel>*:last-child{padding-bottom:15px}
 .dpanel:hover{border-color:var(--line2)}
-.panel-h{color:var(--dim);border-bottom:1px solid var(--line);font-weight:600;letter-spacing:.8px;font-size:11px;padding:12px 16px}
-.dpanel-h{color:var(--dim);border-bottom:1px solid var(--line);border-bottom-style:solid;font-weight:600;letter-spacing:.8px}
+.panel-h,.dpanel-h{color:var(--orange);text-transform:uppercase;font-weight:800;letter-spacing:1.6px;font-size:11px;
+  border-bottom:1px solid var(--line);background:rgba(255,90,31,.05);padding:11px 15px}
+.panel-h{padding:11px 16px}
+.panel-h::before,.dpanel-h::before{content:'';display:inline-block;width:9px;height:9px;background:var(--orange);
+  margin-right:9px;vertical-align:middle;box-shadow:0 0 10px rgba(255,90,31,.7)}
+.panel-h .blink{display:none}
 
-/* テーブル */
-table.inc th{background:var(--panel2);color:var(--dim);border-bottom:1px solid var(--line);font-size:10.5px;letter-spacing:.6px}
+/* ---- テーブル（高コントラスト・骨色文字） ---- */
+table.inc th{background:#1c1c20;color:var(--orange);border-bottom:2px solid var(--line2);font-size:10.5px;
+  letter-spacing:1px;text-transform:uppercase}
 table.inc td{border-bottom:1px solid var(--line)}
-table.inc tbody tr:hover{background:rgba(110,168,254,.07)}
-.t-title{color:var(--ink);font-weight:600}
-th.srt.on .ar{color:var(--cyan)}
+table.inc tbody tr:hover{background:rgba(255,90,31,.08)}
+.t-title{color:var(--ink);font-weight:700}
+.code{color:var(--cyan)}
+th.srt.on{color:#ffd0b8} th.srt.on .ar{color:var(--orange)}
+#inc-sorthint{color:var(--dim)}
 
-/* バッジ類はピル型のソフトカラーに */
-.badge,.type-chip,.sla-tag{border-radius:999px;font-weight:600}
+/* ---- バッジ（角ばった・太字） ---- */
+.badge,.type-chip,.sla-tag{border-radius:3px;font-weight:800;letter-spacing:.5px}
 
-/* 入力・ボタン */
-.inp{border-radius:10px;border-color:var(--line2);background:rgba(255,255,255,.04)}
-.inp:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(110,168,254,.18)}
-.btn-jack{background:var(--cyan);color:#06203f;border:none;border-radius:10px;font-weight:700;letter-spacing:.3px;text-shadow:none}
-.btn-jack:hover{background:#8bb8ff}
-.btn-ok{background:var(--green);color:#05281b;border:none;border-radius:10px;font-weight:700}
-.btn-ok:hover{background:#5fdca3}
-.btn-ghost{border-radius:10px;border-color:var(--line2)}
-.btn-ghost:hover{border-color:var(--cyan);background:rgba(110,168,254,.08)}
-.btn-del{border-radius:10px}
+/* ---- 入力・ボタン（角ばり・蛍光） ---- */
+.inp{border-radius:3px;border-color:var(--line2);background:rgba(0,0,0,.35)}
+.inp:focus{border-color:var(--orange);box-shadow:0 0 0 2px rgba(255,90,31,.25)}
+.btn-jack{background:var(--orange);color:#180600;border:none;border-radius:3px;font-weight:800;letter-spacing:1px;
+  text-transform:uppercase;text-shadow:none;box-shadow:0 0 18px rgba(255,90,31,.4)}
+.btn-jack:hover{background:#ff7544;box-shadow:0 0 26px rgba(255,90,31,.6)}
+.btn-ok{background:var(--cyan);color:#04231f;border:none;border-radius:3px;font-weight:800;letter-spacing:.5px}
+.btn-ok:hover{background:#4ff0e0;box-shadow:0 0 22px rgba(34,227,208,.5)}
+.btn-ghost{border-radius:3px;border-color:var(--line2)}
+.btn-ghost:hover{border-color:var(--orange);color:var(--orange);background:rgba(255,90,31,.08)}
+.btn-del{border-radius:3px}
 
-/* ドロワー / ダイアログ */
-.drawer{background:#0e131c;border-left:1px solid var(--line)}
-.dlg-box{border-radius:16px;border-color:var(--line2)}
-.form-row label{color:var(--dim);letter-spacing:.5px}
-.prio-preview{border-radius:10px;border-style:solid}
-.type-help{border-radius:10px}
+/* ---- ドロワー / ダイアログ ---- */
+body:not(.light) .drawer{background:linear-gradient(180deg,#15120f,#0c0b0d)}
+.drawer{border-left:2px solid var(--orange)}
+.dr-title{color:var(--ink)}
+.dlg-box{border-radius:5px;border-color:var(--line2)}
+.form-row label{color:var(--cyan);letter-spacing:1px;text-transform:uppercase;font-size:11px}
+
+/* ---- ダッシュボードの分析を大きく・見やすく ---- */
+.donut{--sz:150px}
+.donut-hole b{font-size:30px;color:var(--ink)}
+.donut-legend{min-width:160px}
+.lg-row{font-size:13px}
+.mb-row{font-size:12.5px;margin-bottom:2px}
+.mb-row .lbl{width:74px;color:var(--ink)}
+.mb-track{height:12px;border-radius:2px;background:rgba(236,227,208,.08)}
+.mb-fill{border-radius:2px}
+.mb-row .num{font-weight:800;color:var(--ink);font-family:var(--mono)}
+.dpanel-h{position:relative}
 
 /* ドーナツ中央の数字 */
 .donut-hole b{color:var(--ink)}
