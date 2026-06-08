@@ -479,7 +479,7 @@ function renderDashCards(s){
     <div class="dpanel"><div class="dpanel-h">優先度 / PRIORITY</div><div class="minibars">${prows}</div></div>
     <div class="dpanel"><div class="dpanel-h">種別 / TYPE</div><div class="minibars">${trows}</div></div>
     <div class="dpanel span2"><div class="dpanel-h">起票 vs 解決トレンド</div>${trendChart(s.trend)}</div>
-    <div class="dpanel span2"><div class="dpanel-h">分類別 / CATEGORY</div><div class="minibars">${crows}</div></div>`;
+    <div class="dpanel"><div class="dpanel-h">分類別 / CATEGORY</div><div class="minibars">${crows}</div></div>`;
 }
 
 /* ============================================================ LIST */
@@ -810,18 +810,27 @@ function startTutorial(force){ const key=tourKey();
   if(!force){ try{ if(localStorage.getItem(key)) return; }catch(e){} } Tour.start(tourSteps(), key); }
 
 /* ============================================================ INIT */
-/* ============================================================ THEME（明/暗） */
-function applyTheme(t){
-  const light = t==='light';
-  document.body.classList.toggle('light', light);
-  const b=$('#btn-theme'); if(b){ b.textContent=light?'🌙':'☀'; b.title=light?'暗い表示に切替':'明るい表示に切替'; }
+/* ============================================================ THEME（切替式・いつでも戻せる） */
+const THEMES=['marathon','classic','light'];
+const THEME_LABEL={marathon:'マラソン',classic:'クラシック',light:'ライト'};
+const THEME_ICON={marathon:'◣',classic:'▦',light:'☀'};
+function applyTheme(name){
+  if(!THEMES.includes(name)) name='marathon';
+  document.body.classList.remove('marathon','light');
+  if(name==='marathon') document.body.classList.add('marathon');
+  else if(name==='light') document.body.classList.add('light');
+  document.body.dataset.theme=name;
+  const b=$('#btn-theme'); if(b){ b.textContent=THEME_ICON[name]; b.title=`テーマ: ${THEME_LABEL[name]}（クリックで切替）`; }
 }
+function currentTheme(){ return document.body.dataset.theme||'marathon'; }
 function initTheme(){
-  let t='dark'; try{ t=localStorage.getItem('inc-theme')||'dark'; }catch(e){}
+  let t; try{ t=localStorage.getItem('inc-theme'); }catch(e){}
+  if(t==='dark'||!t) t='marathon';        // 旧設定/未設定はマラソンを既定に
   applyTheme(t);
   const b=$('#btn-theme'); if(b) b.onclick=()=>{
-    const next=document.body.classList.contains('light')?'dark':'light';
+    const next=THEMES[(THEMES.indexOf(currentTheme())+1)%THEMES.length];
     try{ localStorage.setItem('inc-theme',next); }catch(e){} applyTheme(next);
+    if(typeof toast==='function') toast('テーマ: '+THEME_LABEL[next],'info');
   };
 }
 

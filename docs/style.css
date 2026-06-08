@@ -134,7 +134,7 @@ button,input,select,textarea{font-family:inherit;color:inherit}
 
 /* ---- ダッシュボード分析パネル ---- */
 .dpanel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow:hidden}
-.dpanel.span2{grid-column:1 / -1}
+.dpanel.span2{grid-column:span 2}
 /* ダッシュボードは横に広がりすぎないよう3列固定＋最大幅で中央寄せ（バランス調整） */
 #dash-cards{grid-template-columns:repeat(3,minmax(0,1fr));max-width:1500px;margin:0 auto 16px}
 #view-dashboard>.panel{max-width:1500px;margin-left:auto;margin-right:auto}
@@ -507,11 +507,11 @@ body.light .card::before{box-shadow:none}
 body.light .badge,body.light .type-chip,body.light .sla-tag{box-shadow:none!important}
 
 /* ============================================================
-   MARATHON CYBERPUNK — ゴリゴリのサイバーパンク（Bungie Marathon 風）
-   骨色クリーム × 漆黒 × 蛍光オレンジ／ティール。角ばったブロック・大型読み値。
-   主眼：ダッシュボードを「誰が見てもぱっと分かる」視認性に。
+   THEME: MARATHON — ゴリゴリのサイバーパンク（Bungie Marathon 風）
+   骨色クリーム × 漆黒 × 蛍光オレンジ／ティール。角ばったブロック・大型読み値・HUD照準枠。
+   ★ body.marathon にスコープ＝テーマ切替で「クラシック / ライト」へいつでも戻せる
    ============================================================ */
-:root{
+body.marathon{
   --bg:#0a0a0c;
   --panel:#121215; --panel2:#17171b;
   --line:rgba(236,227,208,.16); --line2:rgba(236,227,208,.34);
@@ -523,103 +523,114 @@ body.light .badge,body.light .type-chip,body.light .sla-tag{box-shadow:none!impo
   --ok:#37e29a; --warn:#ffc23d; --bad:#ff3b46;
   --glow:0 0 12px rgba(255,90,31,.40);
 }
-/* 背景演出はサイバーパンクとして“あえて”復活（暗所のみ） */
-body:not(.light){background:radial-gradient(125% 110% at 50% -12%,#1b1109 0%,#0b0a0c 52%,#070708 100%)!important}
-body:not(.light) #matrix{opacity:.07}
-body:not(.light) .scanlines{opacity:.22}
-body:not(.light) .bg-grid{background:
+/* 背景演出（暗所） */
+body.marathon{background:radial-gradient(125% 110% at 50% -12%,#1b1109 0%,#0b0a0c 52%,#070708 100%)!important}
+body.marathon #matrix{opacity:.07}
+body.marathon .scanlines{opacity:.20}
+body.marathon .bg-grid{background:
    linear-gradient(rgba(255,90,31,.06) 1px,transparent 1px) 0 0/100% 40px,
    linear-gradient(90deg,rgba(255,90,31,.05) 1px,transparent 1px) 0 0/40px 100%}
-body:not(.light) .vignette{box-shadow:inset 0 0 200px rgba(0,0,0,.6)}
+body.marathon .vignette{box-shadow:inset 0 0 200px rgba(0,0,0,.6)}
 
-/* ---- トップバー（角ばった司令室ヘッダー） ---- */
-.topbar{background:linear-gradient(180deg,rgba(20,16,12,.96),rgba(11,10,12,.92));backdrop-filter:blur(8px);
-  border-bottom:2px solid var(--orange);padding:10px 18px;gap:16px}
-.tb-brand{letter-spacing:2px;color:var(--ink)}
-.logo-mark{color:var(--orange);text-shadow:0 0 14px rgba(255,90,31,.6)}
-.nav-tab{border-radius:3px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;border:1px solid transparent;color:var(--dim)}
-.nav-tab:hover{color:var(--ink);border-color:var(--line2);background:rgba(255,90,31,.08)}
-body:not(.light) .nav-tab.active{background:var(--orange);color:#1a0700;border-color:var(--orange);box-shadow:0 0 20px rgba(255,90,31,.55)}
-.ico-btn{border-radius:3px;border-color:var(--line2)}
-.ico-btn:hover{color:var(--orange);border-color:var(--orange);background:rgba(255,90,31,.08)}
-.std-badge{background:rgba(255,90,31,.10);border:1px solid var(--orange);color:#ffb489;font-weight:700;border-radius:3px;letter-spacing:1px}
+/* ---- トップバー（ハザードストライプ＋角ばった司令室ヘッダー） ---- */
+body.marathon .topbar{background:linear-gradient(180deg,rgba(20,16,12,.96),rgba(11,10,12,.92));backdrop-filter:blur(8px);
+  border-bottom:2px solid var(--orange);padding:10px 18px;gap:16px;position:relative}
+body.marathon .topbar::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;
+  background:repeating-linear-gradient(135deg,var(--orange) 0 10px,transparent 10px 20px);opacity:.5}
+body.marathon .tb-brand{letter-spacing:2px;color:var(--ink)}
+body.marathon .logo-mark{color:var(--orange);text-shadow:0 0 14px rgba(255,90,31,.6)}
+body.marathon .nav-tab{border-radius:3px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;border:1px solid transparent;color:var(--dim)}
+body.marathon .nav-tab:hover{color:var(--ink);border-color:var(--line2);background:rgba(255,90,31,.08)}
+body.marathon .nav-tab.active{background:var(--orange);color:#1a0700;border-color:var(--orange);box-shadow:0 0 20px rgba(255,90,31,.55)}
+body.marathon .ico-btn{border-radius:3px;border-color:var(--line2)}
+body.marathon .ico-btn:hover{color:var(--orange);border-color:var(--orange);background:rgba(255,90,31,.08)}
+body.marathon .std-badge{background:rgba(255,90,31,.10);border:1px solid var(--orange);color:#ffb489;font-weight:700;border-radius:3px;letter-spacing:1px}
 
 /* ---- KPI（大型・色分け・一目で危険が分かる） ---- */
-.statstrip{background:linear-gradient(180deg,rgba(18,18,21,.6),transparent);border-bottom:1px solid var(--line);
+body.marathon .statstrip{background:linear-gradient(180deg,rgba(18,18,21,.6),transparent);border-bottom:1px solid var(--line);
   padding:16px 18px;gap:12px;overflow-x:auto}
-.kpi{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--line2);border-radius:4px;
-  padding:13px 18px 14px;min-width:176px;flex:1}
-.kpi::before{display:none}
-.kpi-k{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;color:var(--dim)}
-.kpi-v{font-size:40px;font-weight:800;letter-spacing:-.5px;margin:2px 0 1px}
-.kpi-s{font-size:10.5px;letter-spacing:.4px}
-.kpi.cyan{border-left-color:var(--cyan)} .kpi.cyan .kpi-v{color:var(--cyan);text-shadow:0 0 16px rgba(34,227,208,.35)}
-.kpi.green{border-left-color:var(--green)} .kpi.green .kpi-v{color:var(--green);text-shadow:0 0 16px rgba(55,226,154,.3)}
-.kpi.warn{border-left-color:var(--gold);background:linear-gradient(180deg,rgba(255,194,61,.10),transparent)} .kpi.warn .kpi-v{color:var(--gold)}
-.kpi.bad{border-left-color:var(--bad);background:linear-gradient(180deg,rgba(255,59,70,.16),rgba(255,59,70,.02))}
-.kpi.bad .kpi-v{color:#ff6b73;text-shadow:0 0 18px rgba(255,59,70,.55)}
-.kpi.bad .kpi-k{color:#ff9aa0}
+body.marathon .kpi{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--line2);border-radius:4px;
+  padding:13px 18px 14px;min-width:176px;flex:1;position:relative}
+body.marathon .kpi::before{display:block;content:'';position:absolute;top:8px;right:9px;width:5px;height:5px;background:var(--dimmer);border-radius:0;left:auto;bottom:auto}
+body.marathon .kpi-k{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;color:var(--dim)}
+body.marathon .kpi-v{font-size:40px;font-weight:800;letter-spacing:-.5px;margin:2px 0 1px}
+body.marathon .kpi-s{font-size:10.5px;letter-spacing:.4px}
+body.marathon .kpi.cyan{border-left-color:var(--cyan)} body.marathon .kpi.cyan .kpi-v{color:var(--cyan);text-shadow:0 0 16px rgba(34,227,208,.35)} body.marathon .kpi.cyan::before{background:var(--cyan)}
+body.marathon .kpi.green{border-left-color:var(--green)} body.marathon .kpi.green .kpi-v{color:var(--green);text-shadow:0 0 16px rgba(55,226,154,.3)} body.marathon .kpi.green::before{background:var(--green)}
+body.marathon .kpi.warn{border-left-color:var(--gold);background:linear-gradient(180deg,rgba(255,194,61,.10),transparent)} body.marathon .kpi.warn .kpi-v{color:var(--gold)} body.marathon .kpi.warn::before{background:var(--gold)}
+body.marathon .kpi.bad{border-left-color:var(--bad);background:linear-gradient(180deg,rgba(255,59,70,.16),rgba(255,59,70,.02))}
+body.marathon .kpi.bad .kpi-v{color:#ff6b73;text-shadow:0 0 18px rgba(255,59,70,.55)}
+body.marathon .kpi.bad .kpi-k{color:#ff9aa0} body.marathon .kpi.bad::before{background:var(--bad);box-shadow:0 0 8px var(--bad);animation:pulse 1.4s ease-in-out infinite}
 
-/* ---- パネル / 分析カード（角ばったブロック＋見出しブロック） ---- */
-.view{padding:18px}
-.panel,.dpanel{background:linear-gradient(180deg,rgba(20,20,24,.96),rgba(15,15,18,.96));
-  border:1px solid var(--line);border-radius:5px;box-shadow:0 0 0 1px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35)}
-.dpanel{padding:0;overflow:hidden}
-.dpanel .dpanel-h{margin:0;padding:11px 15px}
-.dpanel>*:not(.dpanel-h){padding-left:15px;padding-right:15px}
-.dpanel>.dpanel-h + *{padding-top:15px}
-.dpanel>*:last-child{padding-bottom:15px}
-.dpanel:hover{border-color:var(--line2)}
-.panel-h,.dpanel-h{color:var(--orange);text-transform:uppercase;font-weight:800;letter-spacing:1.6px;font-size:11px;
-  border-bottom:1px solid var(--line);background:rgba(255,90,31,.05);padding:11px 15px}
-.panel-h{padding:11px 16px}
-.panel-h::before,.dpanel-h::before{content:'';display:inline-block;width:9px;height:9px;background:var(--orange);
+/* ---- パネル / 分析カード（角ばったブロック＋HUD照準枠） ---- */
+body.marathon .view{padding:18px}
+body.marathon .panel,body.marathon .dpanel{position:relative;background:linear-gradient(180deg,rgba(22,22,26,.97),rgba(14,14,17,.97));
+  border:1px solid var(--line2);border-radius:0;box-shadow:0 0 0 1px rgba(0,0,0,.35),0 8px 30px rgba(0,0,0,.45)}
+body.marathon .dpanel{padding:0;overflow:visible;transition:border-color .15s,box-shadow .15s}
+body.marathon .panel{overflow:visible}
+body.marathon .dpanel .dpanel-h{margin:0;padding:11px 15px}
+body.marathon .dpanel>*:not(.dpanel-h){padding-left:15px;padding-right:15px}
+body.marathon .dpanel>.dpanel-h + *{padding-top:15px}
+body.marathon .dpanel>*:last-child{padding-bottom:15px}
+body.marathon .dpanel:hover{border-color:var(--orange);box-shadow:0 0 0 1px rgba(255,90,31,.25),0 8px 34px rgba(255,90,31,.10)}
+/* HUD コーナーブラケット（近未来の照準フレーム：左上・右下） */
+body.marathon .dpanel::before,body.marathon .dpanel::after,body.marathon .panel::before,body.marathon .panel::after{content:'';position:absolute;width:14px;height:14px;
+  border:2px solid var(--orange);pointer-events:none;z-index:3;filter:drop-shadow(0 0 5px rgba(255,90,31,.55))}
+body.marathon .dpanel::before,body.marathon .panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+body.marathon .dpanel::after,body.marathon .panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+/* 見出し：オレンジ大文字＋先頭ブロック＋スキャングラデ */
+body.marathon .panel-h,body.marathon .dpanel-h{color:var(--orange);text-transform:uppercase;font-weight:800;letter-spacing:1.6px;font-size:11px;
+  border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(255,90,31,.12),rgba(255,90,31,.02) 55%,transparent);padding:11px 15px;position:relative}
+body.marathon .panel-h{padding:11px 16px}
+body.marathon .panel-h::before,body.marathon .dpanel-h::before{content:'';display:inline-block;width:9px;height:9px;background:var(--orange);
   margin-right:9px;vertical-align:middle;box-shadow:0 0 10px rgba(255,90,31,.7)}
-.panel-h .blink{display:none}
+body.marathon .panel-h .blink{display:none}
+/* トレンドチャートに薄いHUDグリッド線 */
+body.marathon .trend{background:repeating-linear-gradient(0deg,rgba(236,227,208,.05) 0 1px,transparent 1px 25%);
+  border-left:1px solid var(--line);border-bottom:1px solid var(--line2);padding-left:4px}
+body.marathon .tr-bars i{filter:drop-shadow(0 0 4px rgba(34,227,208,.4))}
 
 /* ---- テーブル（高コントラスト・骨色文字） ---- */
-table.inc th{background:#1c1c20;color:var(--orange);border-bottom:2px solid var(--line2);font-size:10.5px;
+body.marathon table.inc th{background:#1c1c20;color:var(--orange);border-bottom:2px solid var(--line2);font-size:10.5px;
   letter-spacing:1px;text-transform:uppercase}
-table.inc td{border-bottom:1px solid var(--line)}
-table.inc tbody tr:hover{background:rgba(255,90,31,.08)}
-.t-title{color:var(--ink);font-weight:700}
-.code{color:var(--cyan)}
-th.srt.on{color:#ffd0b8} th.srt.on .ar{color:var(--orange)}
-#inc-sorthint{color:var(--dim)}
+body.marathon table.inc td{border-bottom:1px solid var(--line)}
+body.marathon table.inc tbody tr:hover{background:rgba(255,90,31,.08)}
+body.marathon .t-title{color:var(--ink);font-weight:700}
+body.marathon .code{color:var(--cyan)}
+body.marathon th.srt.on{color:#ffd0b8} body.marathon th.srt.on .ar{color:var(--orange)}
+body.marathon #inc-sorthint{color:var(--dim)}
 
 /* ---- バッジ（角ばった・太字） ---- */
-.badge,.type-chip,.sla-tag{border-radius:3px;font-weight:800;letter-spacing:.5px}
+body.marathon .badge,body.marathon .type-chip,body.marathon .sla-tag{border-radius:3px;font-weight:800;letter-spacing:.5px}
 
 /* ---- 入力・ボタン（角ばり・蛍光） ---- */
-.inp{border-radius:3px;border-color:var(--line2);background:rgba(0,0,0,.35)}
-.inp:focus{border-color:var(--orange);box-shadow:0 0 0 2px rgba(255,90,31,.25)}
-.btn-jack{background:var(--orange);color:#180600;border:none;border-radius:3px;font-weight:800;letter-spacing:1px;
+body.marathon .inp{border-radius:3px;border-color:var(--line2);background:rgba(0,0,0,.35)}
+body.marathon .inp:focus{border-color:var(--orange);box-shadow:0 0 0 2px rgba(255,90,31,.25)}
+body.marathon .btn-jack{background:var(--orange);color:#180600;border:none;border-radius:3px;font-weight:800;letter-spacing:1px;
   text-transform:uppercase;text-shadow:none;box-shadow:0 0 18px rgba(255,90,31,.4)}
-.btn-jack:hover{background:#ff7544;box-shadow:0 0 26px rgba(255,90,31,.6)}
-.btn-ok{background:var(--cyan);color:#04231f;border:none;border-radius:3px;font-weight:800;letter-spacing:.5px}
-.btn-ok:hover{background:#4ff0e0;box-shadow:0 0 22px rgba(34,227,208,.5)}
-.btn-ghost{border-radius:3px;border-color:var(--line2)}
-.btn-ghost:hover{border-color:var(--orange);color:var(--orange);background:rgba(255,90,31,.08)}
-.btn-del{border-radius:3px}
+body.marathon .btn-jack:hover{background:#ff7544;box-shadow:0 0 26px rgba(255,90,31,.6)}
+body.marathon .btn-ok{background:var(--cyan);color:#04231f;border:none;border-radius:3px;font-weight:800;letter-spacing:.5px}
+body.marathon .btn-ok:hover{background:#4ff0e0;box-shadow:0 0 22px rgba(34,227,208,.5)}
+body.marathon .btn-ghost{border-radius:3px;border-color:var(--line2)}
+body.marathon .btn-ghost:hover{border-color:var(--orange);color:var(--orange);background:rgba(255,90,31,.08)}
+body.marathon .btn-del{border-radius:3px}
 
 /* ---- ドロワー / ダイアログ ---- */
-body:not(.light) .drawer{background:linear-gradient(180deg,#15120f,#0c0b0d)}
-.drawer{border-left:2px solid var(--orange)}
-.dr-title{color:var(--ink)}
-.dlg-box{border-radius:5px;border-color:var(--line2)}
-.form-row label{color:var(--cyan);letter-spacing:1px;text-transform:uppercase;font-size:11px}
+body.marathon .drawer{background:linear-gradient(180deg,#15120f,#0c0b0d);border-left:2px solid var(--orange)}
+body.marathon .dr-title{color:var(--ink)}
+body.marathon .dlg-box{border-radius:5px;border-color:var(--line2)}
+body.marathon .form-row label{color:var(--cyan);letter-spacing:1px;text-transform:uppercase;font-size:11px}
 
 /* ---- ダッシュボードの分析を大きく・見やすく ---- */
-.donut{--sz:150px}
-.donut-hole b{font-size:30px;color:var(--ink)}
-.donut-legend{min-width:160px}
-.lg-row{font-size:13px}
-.mb-row{font-size:12.5px;margin-bottom:2px}
-.mb-row .lbl{width:74px;color:var(--ink)}
-.mb-track{height:12px;border-radius:2px;background:rgba(236,227,208,.08)}
-.mb-fill{border-radius:2px}
-.mb-row .num{font-weight:800;color:var(--ink);font-family:var(--mono)}
-.dpanel-h{position:relative}
+body.marathon .donut{--sz:150px}
+body.marathon .donut-hole b{font-size:30px;color:var(--ink)}
+body.marathon .donut-legend{min-width:160px}
+body.marathon .lg-row{font-size:13px}
+body.marathon .mb-row{font-size:12.5px;margin-bottom:2px}
+body.marathon .mb-row .lbl{width:74px;color:var(--ink)}
+body.marathon .mb-track{height:12px;border-radius:2px;background:rgba(236,227,208,.08)}
+body.marathon .mb-fill{border-radius:2px}
+body.marathon .mb-row .num{font-weight:800;color:var(--ink);font-family:var(--mono)}
 
 /* ドーナツ中央の数字 */
 .donut-hole b{color:var(--ink)}
