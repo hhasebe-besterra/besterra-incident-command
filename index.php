@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=12">
+<link rel="stylesheet" href="app.css?v=13">
 </head>
 <body class="booting">
 
@@ -99,6 +99,7 @@
       <select id="f-channel" class="inp"><option value="">経路: 全て</option></select>
     </div>
     <div class="panel">
+      <div class="panel-h" id="inc-sorthint"></div>
       <div id="inc-list" class="inc-table-wrap"></div>
     </div>
   </section>
@@ -131,6 +132,6 @@
 <!-- トースト -->
 <div class="toasts" id="toasts"></div>
 
-<script src="app.js?v=12"></script>
+<script src="app.js?v=13"></script>
 </body>
 </html>

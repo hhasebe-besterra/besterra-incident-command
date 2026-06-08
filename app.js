@@ -71,7 +71,7 @@ async function openLinkDialog(selected, excludeCode, onDone){
   $('#lk-done').onclick=()=>{ selected.clear(); work.forEach(c=>selected.add(c)); closeDialog(); onDone&&onDone(); };
 }
 
-const State = { meta:null, user:null, view:'dashboard', incidents:[], employees:[], assignees:[] };
+const State = { meta:null, user:null, view:'dashboard', incidents:[], employees:[], assignees:[], sort:{key:'priority',dir:'asc'} };
 
 /* ---------- API ---------- */
 async function api(action, params={}, method='POST'){
@@ -316,9 +316,9 @@ function renderDashCards(s){
 }
 
 /* ============================================================ LIST */
-function incTable(list){
-  if(!list.length) return `<div class="empty">▢ 該当チケットなし — ALL CLEAR</div>`;
-  const rows=list.map(i=>`
+const LIST_COLS=[['code','CODE'],['type','種別'],['priority','優先'],['status','状態'],['received_at','問合日'],['reporter','申請者'],['title','件名 / 分類'],['assignee','担当'],['updated_at','最終更新日時']];
+function incRows(list){
+  return list.map(i=>`
     <tr data-id="${i.id}">
       <td class="code">${esc(i.code)}</td>
       <td class="c-chip">${typeChip(i.type)}</td>
@@ -331,14 +331,53 @@ function incTable(list){
       <td class="t-meta c-kv" data-label="担当">${esc(i.assignee||'未割当')}</td>
       <td class="t-meta c-kv" data-label="最終更新日時" title="${esc(ago(i.updated_at))}">${esc(fmt(i.updated_at))}</td>
     </tr>`).join('');
-  return `<table class="inc"><thead><tr><th>CODE</th><th>種別</th><th>優先</th><th>状態</th><th>問合日</th><th>申請者</th><th>件名 / 分類</th><th>担当</th><th>最終更新日時</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function incTable(list, sortable){
+  if(!list.length) return `<div class="empty">▢ 該当チケットなし — ALL CLEAR</div>`;
+  const th=LIST_COLS.map(([k,label])=>{
+    if(!sortable) return `<th>${label}</th>`;
+    const on=State.sort.key===k, ar=on?(State.sort.dir==='asc'?'▲':'▼'):'△';
+    return `<th class="srt${on?' on':''}" data-k="${k}" title="クリックで並び替え">${label}<span class="ar">${ar}</span></th>`;
+  }).join('');
+  return `<table class="inc"><thead><tr>${th}</tr></thead><tbody>${incRows(list)}</tbody></table>`;
+}
+const SORT_RANKP={P1:1,P2:2,P3:3,P4:4,P5:5}, SORT_STORDER={NEW:0,IN_PROGRESS:1,ON_HOLD:2,RESOLVED:3,CLOSED:4,CANCELLED:5};
+function sortList(list,key,dir){
+  const val=r=>{ switch(key){
+    case 'priority':return SORT_RANKP[r.priority]||9;
+    case 'status':return SORT_STORDER[r.status]??9;
+    case 'received_at':return r.received_at?new Date(r.received_at).getTime():0;
+    case 'updated_at':return r.updated_at?new Date(r.updated_at).getTime():0;
+    default:return String(r[key]||'').toLowerCase(); } };
+  return [...list].sort((a,b)=>{ const x=val(a),y=val(b); let c=x<y?-1:x>y?1:0;
+    if(c!==0) return dir==='desc'?-c:c;
+    return new Date(b.updated_at||0)-new Date(a.updated_at||0); });
+}
+function defaultDir(key){ return (key==='received_at'||key==='updated_at')?'desc':'asc'; }
+function sortHintText(key,dir){
+  const L={code:'コード',type:'種別',priority:'優先度',status:'状態',received_at:'問合日',reporter:'申請者',title:'件名',assignee:'担当',updated_at:'最終更新日時'};
+  let d; if(key==='priority') d=dir==='asc'?'高い順 P1→P5':'低い順 P5→P1';
+  else if(key==='status') d=dir==='asc'?'未対応が上→完了が下':'完了が上';
+  else if(key==='received_at'||key==='updated_at') d=dir==='asc'?'古い順':'新しい順';
+  else d=dir==='asc'?'昇順 (あ→ん / A→Z)':'降順 (ん→あ / Z→A)';
+  return `並び替え：<b style="color:var(--gold)">${L[key]||key}</b>（${d}）　｜　列見出しをクリックで変更　・　全 ${State.incidents.length} 件`;
 }
 function bindRows(scope){ $$(`${scope} tr[data-id]`).forEach(tr=>tr.onclick=()=>openIncident(+tr.dataset.id)); }
+function renderIncList(){
+  const sorted=sortList(State.incidents, State.sort.key, State.sort.dir);
+  $('#inc-list').innerHTML=incTable(sorted,true); bindRows('#inc-list');
+  const hint=$('#inc-sorthint'); if(hint) hint.innerHTML=sortHintText(State.sort.key,State.sort.dir);
+  $$('#inc-list th.srt').forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k;
+    if(State.sort.key===k) State.sort.dir=State.sort.dir==='asc'?'desc':'asc';
+    else { State.sort.key=k; State.sort.dir=defaultDir(k); }
+    renderIncList();
+  });
+}
 async function loadIncidents(){
   const p={ q:$('#f-q').value.trim(), scope:$('#f-scope').value, type:$('#f-type').value,
     priority:$('#f-priority').value, status:$('#f-status').value, category:$('#f-cat').value, channel:$('#f-channel').value };
-  const j=await api('list',p,'GET'); State.incidents=j.incidents;
-  $('#inc-list').innerHTML=incTable(j.incidents); bindRows('#inc-list');
+  const j=await api('list',p,'GET'); State.incidents=j.incidents||[]; renderIncList();
 }
 
 /* ============================================================ DRAWER */
