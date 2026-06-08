@@ -25,30 +25,50 @@ function typeHelpHtml(t){ const h=TYPE_HELP[t]; if(!h) return '';
     + (h.tip?`<div class="th-tip">💡 ${esc(h.tip)}</div>`:''); }
 
 // 関連チケットを既存チケットの一覧からチェック選択（複数可・文字入力不要）
-async function initLinkPicker(hostId, selectedCsv, excludeCode){
+/* 関連チケット：ホストにはボタン＋選択チップだけを置き、選択は別ウィンドウ（ダイアログ）で行う */
+function initLinkPicker(hostId, selectedCsv, excludeCode){
   const host=document.getElementById(hostId); if(!host) return;
+  host.classList.add('lk-field');
   const selected=new Set(String(selectedCsv||'').split(',').map(s=>s.trim()).filter(Boolean));
-  host.innerHTML='<div class="t-meta" style="padding:6px">読み込み中…</div>';
+  host._getLinked=()=>[...selected].join(',');
+  const paint=()=>{
+    host.innerHTML=`<button type="button" class="btn-ghost lk-open">🔗 関連チケットを選ぶ${selected.size?`（${selected.size}件）`:''}</button>
+      <div class="lk-chips"></div>`;
+    const chips=host.querySelector('.lk-chips');
+    chips.innerHTML = selected.size
+      ? [...selected].map(c=>`<span class="lk-chip"><span class="lk-code">${esc(c)}</span><button type="button" class="lk-x" data-c="${esc(c)}" title="外す">✕</button></span>`).join('')
+      : '<span class="t-meta">未選択（任意）</span>';
+    host.querySelector('.lk-open').onclick=()=>openLinkDialog(selected, excludeCode, paint);
+    chips.querySelectorAll('.lk-x').forEach(b=>b.onclick=()=>{ selected.delete(b.dataset.c); paint(); });
+  };
+  paint();
+}
+async function openLinkDialog(selected, excludeCode, onDone){
+  openDialog(`<h3>🔗 関連チケットを選ぶ</h3>
+    <input class="inp lk-search" placeholder="🔍 コード・件名でしぼり込み" style="width:100%">
+    <div class="lk-list" style="margin-top:10px"><div class="t-meta" style="padding:10px">読み込み中…</div></div>
+    <div class="lk-sel t-meta" style="margin-top:8px"></div>
+    <div class="dlg-actions"><button class="btn-ghost" id="lk-cancel">キャンセル</button><button class="btn-ok" id="lk-done">この内容で確定</button></div>`,'pick');
+  const work=new Set(selected);
+  const listEl=$('#dialog .lk-list'), selEl=$('#dialog .lk-sel');
   let rows=[];
   try{ rows=(await api('list',{})).incidents||[]; }
-  catch(e){ host.innerHTML='<div class="t-meta" style="padding:6px">一覧の取得に失敗しました</div>'; return; }
+  catch(e){ listEl.innerHTML='<div class="t-meta" style="padding:10px">一覧の取得に失敗しました</div>'; }
   if(excludeCode) rows=rows.filter(r=>r.code!==excludeCode);
-  host.innerHTML=`<input class="inp lk-search" placeholder="🔍 コード・件名でしぼり込み（任意）">
-    <div class="lk-list"></div><div class="lk-sel t-meta"></div>`;
-  const listEl=host.querySelector('.lk-list'), selEl=host.querySelector('.lk-sel');
   const render=(filter='')=>{ const f=filter.trim().toLowerCase();
     const shown=rows.filter(r=> !f || (r.code+' '+(r.title||'')).toLowerCase().includes(f));
-    listEl.innerHTML = shown.length ? shown.map(r=>{ const on=selected.has(r.code);
+    listEl.innerHTML = shown.length ? shown.map(r=>{ const on=work.has(r.code);
       return `<label class="lk-item${on?' on':''}"><input type="checkbox" value="${esc(r.code)}" ${on?'checked':''}>`
         +`<span class="lk-code">${esc(r.code)}</span><span class="lk-ttl">${esc(r.title||'')}</span>${statusChip(r.status)}</label>`;
-    }).join('') : '<div class="t-meta" style="padding:8px">該当チケットなし</div>'; };
-  const updSel=()=>{ selEl.textContent = selected.size ? '選択中: '+[...selected].join(' , ') : '選択なし（任意）'; };
-  render(''); updSel();
-  host.querySelector('.lk-search').oninput=e=>render(e.target.value);
+    }).join('') : '<div class="t-meta" style="padding:10px">該当チケットなし</div>'; };
+  const updSel=()=>{ selEl.textContent = work.size ? '選択中: '+[...work].join(' , ') : '選択なし'; };
+  if(rows.length || true){ render(''); updSel(); }
+  $('#dialog .lk-search').oninput=e=>render(e.target.value);
   listEl.onchange=e=>{ const c=e.target; if(!c.matches('input[type=checkbox]')) return;
-    if(c.checked) selected.add(c.value); else selected.delete(c.value);
+    if(c.checked) work.add(c.value); else work.delete(c.value);
     const it=c.closest('.lk-item'); if(it) it.classList.toggle('on',c.checked); updSel(); };
-  host._getLinked=()=>[...selected].join(',');
+  $('#lk-cancel').onclick=closeDialog;
+  $('#lk-done').onclick=()=>{ selected.clear(); work.forEach(c=>selected.add(c)); closeDialog(); onDone&&onDone(); };
 }
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
 const EMAIL_DOMAIN = '@besterra.co.jp';
@@ -381,35 +401,82 @@ function switchView(v){
   if(v==='dashboard') loadDashboard(); if(v==='incidents') loadIncidents();
 }
 
-/* ============================================================ DASHBOARD */
+/* ============================================================ DASHBOARD（ServiceNow / PagerDuty / Jira SM 風） */
 async function loadDashboard(){
-  const s=await api('stats'); renderStatStrip(s); renderDashCards(s);
-  const list=(await api('list',{scope:'open'})).incidents;
-  $('#dash-open').innerHTML=incTable(list); bindRows('#dash-open');
+  const all=(await api('list',{})).incidents||[];
+  const s=computeDash(all);
+  renderStatStrip(s); renderDashCards(s);
+  const openS=M().open_statuses, rank={P1:1,P2:2,P3:3,P4:4,P5:5};
+  const attention=all.filter(r=>openS.includes(r.status))
+    .sort((a,b)=> ((b.sla_breached?1:0)-(a.sla_breached?1:0)) || ((rank[a.priority]||9)-(rank[b.priority]||9)) || (a.created_at<b.created_at?1:-1));
+  $('#dash-open').innerHTML=incTable(attention); bindRows('#dash-open');
 }
+function computeDash(all){
+  const openS=M().open_statuses, DAY=86400000, now=Date.now();
+  const open=all.filter(r=>openS.includes(r.status));
+  const cnt=(key,master)=>{ const o={}; Object.keys(master).forEach(k=>o[k]=0); all.forEach(r=>{ if(r[key]!=null&&r[key]!=='') o[r[key]]=(o[r[key]]||0)+1; }); return o; };
+  const resolved=all.filter(r=>r.resolved_at);
+  const durs=resolved.filter(r=>r.created_at).map(r=>(new Date(r.resolved_at)-new Date(r.created_at))/1000).filter(x=>x>=0);
+  const mttr=durs.length?durs.reduce((a,b)=>a+b,0)/durs.length:null;
+  const csv=resolved.filter(r=>r.csat!=null&&r.csat!=='').map(r=>+r.csat);
+  const days=[]; for(let i=13;i>=0;i--){ const d=new Date(now-i*DAY); d.setHours(0,0,0,0); days.push(d); }
+  const inDay=(iso,s,e)=>{ if(!iso) return false; const t=new Date(iso).getTime(); return t>=s&&t<e; };
+  const trend=days.map(d=>{ const s=d.getTime(), e=s+DAY;
+    return { d, opened:all.filter(r=>inDay(r.created_at,s,e)).length, resolved:all.filter(r=>inDay(r.resolved_at,s,e)).length }; });
+  return { total:all.length, open:open.length,
+    critical_open:open.filter(r=>['P1','P2'].includes(r.priority)).length,
+    sla_risk:open.filter(r=>r.sla_breached).length,
+    unassigned:open.filter(r=>!r.assignee).length,
+    resolved_7d:resolved.filter(r=>(now-new Date(r.resolved_at))<7*DAY).length,
+    mttr, fcr_rate:resolved.length?Math.round(resolved.filter(r=>r.fcr).length/resolved.length*100):null,
+    csat:csv.length?(csv.reduce((a,b)=>a+b,0)/csv.length):null,
+    by_type:cnt('type',M().types), by_priority:cnt('priority',M().priorities),
+    by_status:cnt('status',M().statuses), by_category:cnt('category',M().categories), trend };
+}
+const PCOL={P1:'var(--sev1)',P2:'var(--sev2)',P3:'var(--sev3)',P4:'var(--green)',P5:'var(--sev4)'};
+const SCOL={NEW:'#ff9a6b',IN_PROGRESS:'var(--cyan)',ON_HOLD:'var(--gold)',RESOLVED:'var(--green)',CLOSED:'var(--dim)',CANCELLED:'#c98a9a'};
+function kpi(label,val,sub,state){ return `<div class="kpi ${state||''}"><div class="kpi-k">${label}</div><div class="kpi-v">${val}</div><div class="kpi-s">${sub||''}</div></div>`; }
 function renderStatStrip(s){
-  const tcol={incident:'var(--cyan)',request:'var(--green)',problem:'var(--mag)'};
-  const pcol={P1:'var(--sev1)',P2:'var(--sev2)',P3:'var(--sev3)',P4:'var(--green)',P5:'var(--sev4)'};
-  const tbar=Object.entries(s.by_type).map(([k,v])=>`<span class="bar-item"><i class="dot" style="background:${tcol[k]||'#888'}"></i>${M().types[k].short} <b>${v}</b></span>`).join('');
-  const pbar=Object.entries(s.by_priority).map(([k,v])=>`<span class="bar-item"><i class="dot" style="background:${pcol[k]}"></i>${k} <b>${v}</b></span>`).join('');
   $('#statstrip').innerHTML=`
-    <div class="stat"><span class="k">TOTAL</span><span class="v cyan">${s.total}</span></div>
-    <div class="stat"><span class="k">未解決 / OPEN</span><span class="v green">${s.open}</span></div>
-    <div class="stat"><span class="k">要対応 P1-2</span><span class="v ${s.critical_open?'bad':'cyan'}">${s.critical_open}</span></div>
-    <div class="stat"><span class="k">SLA超過</span><span class="v ${s.sla_risk?'bad':'green'}">${s.sla_risk}</span></div>
-    <div class="stat mini"><span class="k">種別 / TYPE</span><div class="bars">${tbar}</div></div>
-    <div class="stat mini"><span class="k">優先度 / PRIORITY</span><div class="bars">${pbar}</div></div>`;
+    ${kpi('未解決 / OPEN', s.open, `全 ${s.total} 件`, s.open?'cyan':'green')}
+    ${kpi('要対応 P1・P2', s.critical_open, '高優先度の未解決', s.critical_open?'bad':'green')}
+    ${kpi('SLA超過', s.sla_risk, '対応期限ごえ', s.sla_risk?'bad':'green')}
+    ${kpi('未割当', s.unassigned, '担当者なし', s.unassigned?'warn':'green')}
+    ${kpi('7日間で解決', s.resolved_7d, '直近1週間', 'green')}
+    ${kpi('平均解決(MTTR)', dur(s.mttr), '起票→解決', 'cyan')}
+    ${kpi('満足度(CSAT)', s.csat==null?'—':('★'+s.csat.toFixed(1)), s.fcr_rate==null?'一次解決 —':('一次解決 '+s.fcr_rate+'%'), 'cyan')}`;
+}
+function donut(byStatus,total){
+  const segs=Object.entries(byStatus).filter(([k,v])=>v>0);
+  if(!total){ return `<div class="donut" style="background:conic-gradient(var(--line2) 0 100%)"><div class="donut-hole"><b>0</b><span>件</span></div></div>`; }
+  let acc=0; const stops=segs.map(([k,v])=>{ const a=acc/total*100, b=(acc+v)/total*100; acc+=v; return `${SCOL[k]} ${a}% ${b}%`; }).join(',');
+  const legend=segs.map(([k,v])=>`<div class="lg-row"><i class="dot" style="background:${SCOL[k]}"></i><span class="lg-n">${esc(M().statuses[k])}</span><b>${v}</b><span class="lg-p">${Math.round(v/total*100)}%</span></div>`).join('');
+  return `<div class="donut-wrap"><div class="donut" style="background:conic-gradient(${stops})"><div class="donut-hole"><b>${total}</b><span>件</span></div></div><div class="donut-legend">${legend}</div></div>`;
+}
+function bars(obj,labelFn,colFn){
+  const max=Math.max(1,...Object.values(obj));
+  return Object.entries(obj).map(([k,v])=>`<div class="mb-row"><span class="lbl">${esc(labelFn(k))}</span><span class="mb-track"><span class="mb-fill" style="width:${v/max*100}%;background:${colFn(k)}"></span></span><span class="num">${v}</span></div>`).join('');
+}
+function trendChart(trend){
+  const max=Math.max(1,...trend.map(t=>Math.max(t.opened,t.resolved)));
+  const cols=trend.map(t=>{ const lbl=`${t.d.getMonth()+1}/${t.d.getDate()}`;
+    return `<div class="tr-col" title="${lbl}　起票 ${t.opened} / 解決 ${t.resolved}">
+      <div class="tr-bars"><i class="tr-o" style="height:${t.opened/max*100}%"></i><i class="tr-r" style="height:${t.resolved/max*100}%"></i></div>
+      <span class="tr-x">${t.d.getDate()}</span></div>`; }).join('');
+  return `<div class="trend">${cols}</div>
+    <div class="trend-legend"><span><i class="dot" style="background:var(--cyan)"></i>起票</span><span><i class="dot" style="background:var(--green)"></i>解決</span><span class="t-meta">直近14日</span></div>`;
 }
 function renderDashCards(s){
-  const tcards=Object.entries(M().types).map(([k,v])=>`<div class="card type-card type-${k}"><div class="ttl">${v.icon} ${esc(v.label)}（累計）</div><div class="big">${s.by_type[k]||0}</div><div class="sub">${esc(v.desc)}</div></div>`).join('');
-  const pmax=Math.max(1,...Object.values(s.by_priority));
-  const pcol={P1:'var(--sev1)',P2:'var(--sev2)',P3:'var(--sev3)',P4:'var(--green)',P5:'var(--sev4)'};
-  const prows=Object.entries(s.by_priority).map(([k,v])=>`<div class="mb-row"><span class="lbl">${esc(M().priorities[k].label)}</span><span class="mb-track"><span class="mb-fill" style="width:${v/pmax*100}%;background:${pcol[k]}"></span></span><span class="num">${v}</span></div>`).join('');
-  const cmax=Math.max(1,...Object.values(s.by_category));
-  const crows=Object.entries(s.by_category).map(([k,v])=>`<div class="mb-row"><span class="lbl">${esc(M().categories[k])}</span><span class="mb-track"><span class="mb-fill" style="width:${v/cmax*100}%;background:var(--cyan)"></span></span><span class="num">${v}</span></div>`).join('');
-  $('#dash-cards').innerHTML=`${tcards}
-    <div class="card" style="grid-column:span 2"><div class="ttl">▣ 優先度内訳（累計）</div><div class="minibars">${prows}</div></div>
-    <div class="card" style="grid-column:span 2"><div class="ttl">▤ 分類別（累計）</div><div class="minibars">${crows}</div></div>`;
+  const prows=bars(s.by_priority,k=>M().priorities[k].label,k=>PCOL[k]);
+  const crows=bars(s.by_category,k=>M().categories[k],()=>'var(--cyan)');
+  const tcol={incident:'var(--cyan)',request:'var(--green)',problem:'var(--mag)',other:'var(--gold)'};
+  const trows=bars(s.by_type,k=>M().types[k].label,k=>tcol[k]||'var(--dim)');
+  $('#dash-cards').innerHTML=`
+    <div class="dpanel"><div class="dpanel-h">ステータス内訳</div>${donut(s.by_status,s.total)}</div>
+    <div class="dpanel"><div class="dpanel-h">優先度 / PRIORITY</div><div class="minibars">${prows}</div></div>
+    <div class="dpanel"><div class="dpanel-h">種別 / TYPE</div><div class="minibars">${trows}</div></div>
+    <div class="dpanel span2"><div class="dpanel-h">起票 vs 解決トレンド</div>${trendChart(s.trend)}</div>
+    <div class="dpanel span2"><div class="dpanel-h">分類別 / CATEGORY</div><div class="minibars">${crows}</div></div>`;
 }
 
 /* ============================================================ LIST */
@@ -600,7 +667,7 @@ function renderReport(r){
 }
 
 /* ============================================================ DIALOG / MODEL / PASSWORD */
-function openDialog(html){ const d=$('#dialog'); d.hidden=false; d.innerHTML=`<div class="dlg-box">${html}</div>`; }
+function openDialog(html,cls=''){ const d=$('#dialog'); d.hidden=false; d.innerHTML=`<div class="dlg-box ${cls}">${html}</div>`; }
 function closeDialog(){ $('#dialog').hidden=true; $('#dialog').innerHTML=''; }
 function openModel(){
   const md=M().model;
