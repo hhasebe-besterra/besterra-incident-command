@@ -13,6 +13,9 @@ import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const APP_URL = Deno.env.get("INC_APP_URL") || "https://hhasebe-besterra.github.io/besterra-incident-command/";
 
+// 当面は Slack のみ配信する（メールは文字化け、Teams も一時停止）。再開は false に戻すだけ。
+const SLACK_ONLY = (Deno.env.get("NOTIFY_SLACK_ONLY") ?? "1") !== "0";
+
 // ---- ラベル（アプリ側 META と一致させる） ----
 const TYPE: Record<string,string> = { incident:"問合せ（インシデント）", request:"リクエスト", problem:"計画・idea", other:"その他" };
 const STATUS: Record<string,string> = { NEW:"新規", IN_PROGRESS:"対応中", ON_HOLD:"保留", RESOLVED:"解決済", CLOSED:"完了", CANCELLED:"中止" };
@@ -159,7 +162,14 @@ Deno.serve(async (req) => {
 
   const r = body.record || {};
   const msg = buildText(ev.kind, r);
-  const [email, teams, slack] = await Promise.all([ sendEmail(msg), sendTeams(msg.html), sendSlack(msg.text) ]);
+  // 2026-06-09 当面は Slack のみ配信。メールは文字化け（denomailer/MIME）のため停止、Teams も一時停止。
+  // 再開時は SLACK_ONLY を false（Secret NOTIFY_SLACK_ONLY=0）にすればメール/Teamsも復活する。
+  let email = "disabled(slack-only)", teams = "disabled(slack-only)", slack:string;
+  if (SLACK_ONLY) {
+    slack = await sendSlack(msg.text);
+  } else {
+    [email, teams, slack] = await Promise.all([ sendEmail(msg), sendTeams(msg.html), sendSlack(msg.text) ]);
+  }
   console.log(JSON.stringify({ code:r.code, kind:ev.kind, email, teams, slack }));
   return new Response(JSON.stringify({ ok:true, kind:ev.kind, email, teams, slack }), { headers:{ "content-type":"application/json" } });
 });
