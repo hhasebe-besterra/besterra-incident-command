@@ -348,8 +348,8 @@ function enterApp(){
   fillSelect('#f-channel', M().channels, '経路: 全て');
   $('#rep-date').value=new Date().toISOString().slice(0,10);
   bindApp();
-  // ログイン後は「起票」画面を既定に（書込ロールのみ・チュートリアル初回は除く）
-  if(isWriter()){ switchView('incidents'); if(tourSeen()) setTimeout(openNew,140); }
+  // ログイン後は「インシデント一覧」画面を既定に（書込ロールのみ）。起票ドロワーは自動で開かない
+  if(isWriter()){ switchView('incidents'); }
   else switchView('dashboard');
   api('employees').then(j=>{ State.employees=j.employees||[]; }).catch(()=>{});
   api('assignees').then(j=>{ State.assignees=j.assignees||[]; }).catch(()=>{});
@@ -814,7 +814,7 @@ const THEMES=['marathon','marathon-deep','classic','light'];
 const THEME_LABEL={marathon:'マラソン明','marathon-deep':'マラソン暗',classic:'クラシック',light:'ライト'};
 const THEME_ICON={marathon:'◤','marathon-deep':'◣',classic:'▦',light:'☀'};
 function applyTheme(name){
-  if(!THEMES.includes(name)) name='marathon';
+  if(!THEMES.includes(name)) name='classic';
   document.body.classList.remove('marathon','deep','light');
   if(name==='marathon') document.body.classList.add('marathon');
   else if(name==='marathon-deep') document.body.classList.add('marathon','deep');
@@ -825,7 +825,7 @@ function applyTheme(name){
 function currentTheme(){ return document.body.dataset.theme||'marathon'; }
 function initTheme(){
   let t; try{ t=localStorage.getItem('inc-theme'); }catch(e){}
-  if(t==='dark'||!t) t='marathon';        // 旧設定/未設定はマラソンを既定に
+  if(t==='dark'||!t) t='classic';        // 旧設定/未設定はクラシックを既定に
   applyTheme(t);
   const b=$('#btn-theme'); if(b) b.onclick=()=>{
     const next=THEMES[(THEMES.indexOf(currentTheme())+1)%THEMES.length];
