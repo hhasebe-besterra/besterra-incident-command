@@ -192,8 +192,8 @@ button,input,select,textarea{font-family:inherit;color:inherit}
 .minibars{margin-top:10px;display:flex;flex-direction:column;gap:5px}
 .mb-row{display:flex;align-items:center;gap:8px;font-size:11px}
 .mb-row .lbl{width:54px;color:var(--dim)}
-.mb-track{flex:1;height:7px;background:rgba(255,255,255,.10);border-radius:4px;overflow:hidden}
-.mb-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.mb-track{flex:1;height:7px;background:rgba(255,255,255,.10);border-radius:4px;overflow:hidden;display:block}
+.mb-fill{display:block;height:100%;border-radius:4px;transition:width .6s ease}
 .mb-row .num{width:26px;text-align:right;color:var(--ink)}
 
 /* ---- パネル & テーブル ---- */
