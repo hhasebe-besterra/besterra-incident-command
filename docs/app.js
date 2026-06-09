@@ -825,6 +825,8 @@ function applyTheme(name){
 function currentTheme(){ return document.body.dataset.theme||'marathon'; }
 function initTheme(){
   let t; try{ t=localStorage.getItem('inc-theme'); }catch(e){}
+  // 2026-06-09 既定をクラシックへ変更。旧バージョンで marathon が既定/保存だった分は一度だけ classic へ移行（light等の明示選択は維持）
+  try{ if(!localStorage.getItem('inc-theme-default-classic')){ localStorage.setItem('inc-theme-default-classic','1'); if(!t||t==='marathon'||t==='dark'){ t='classic'; localStorage.setItem('inc-theme','classic'); } } }catch(e){}
   if(t==='dark'||!t) t='classic';        // 旧設定/未設定はクラシックを既定に
   applyTheme(t);
   const b=$('#btn-theme'); if(b) b.onclick=()=>{
