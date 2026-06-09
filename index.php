@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=19">
+<link rel="stylesheet" href="app.css?v=20">
 </head>
 <body class="booting">
 
@@ -132,6 +132,6 @@
 <!-- トースト -->
 <div class="toasts" id="toasts"></div>
 
-<script src="app.js?v=19"></script>
+<script src="app.js?v=20"></script>
 </body>
 </html>

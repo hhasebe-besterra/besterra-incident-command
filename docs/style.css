@@ -135,10 +135,10 @@ button,input,select,textarea{font-family:inherit;color:inherit}
 /* ---- ダッシュボード分析パネル ---- */
 .dpanel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow:hidden}
 .dpanel.span2{grid-column:span 2}
-/* ダッシュボードは横に広がりすぎないよう3列固定＋最大幅で中央寄せ（バランス調整） */
-#dash-cards{grid-template-columns:repeat(3,minmax(0,1fr));max-width:1500px;margin:0 auto 16px}
+/* ダッシュボードは4パネル（ステータス内訳/優先度/種別/分類別）を2×2でバランス配置＋最大幅で中央寄せ */
+#dash-cards{grid-template-columns:repeat(2,minmax(0,1fr));max-width:1500px;margin:0 auto 16px}
 #view-dashboard>.panel{max-width:1500px;margin-left:auto;margin-right:auto}
-@media(max-width:1100px){ #dash-cards{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media(max-width:760px){ #dash-cards{grid-template-columns:1fr} }
 .dpanel-h{color:var(--cyan);font-size:10.5px;letter-spacing:2px;font-weight:700;margin-bottom:12px;
   border-bottom:1px dashed var(--line2);padding-bottom:8px}
 

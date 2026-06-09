@@ -478,7 +478,6 @@ function renderDashCards(s){
     <div class="dpanel"><div class="dpanel-h">ステータス内訳</div>${donut(s.by_status,s.total)}</div>
     <div class="dpanel"><div class="dpanel-h">優先度 / PRIORITY</div><div class="minibars">${prows}</div></div>
     <div class="dpanel"><div class="dpanel-h">種別 / TYPE</div><div class="minibars">${trows}</div></div>
-    <div class="dpanel span2"><div class="dpanel-h">起票 vs 解決トレンド</div>${trendChart(s.trend)}</div>
     <div class="dpanel"><div class="dpanel-h">分類別 / CATEGORY</div><div class="minibars">${crows}</div></div>`;
 }
 
