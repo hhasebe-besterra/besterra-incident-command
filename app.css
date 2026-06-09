@@ -512,19 +512,31 @@ body.light .badge,body.light .type-chip,body.light .sla-tag{box-shadow:none!impo
    ★ body.marathon にスコープ＝テーマ切替で「クラシック / ライト」へいつでも戻せる
    ============================================================ */
 body.marathon{
+  /* 既定＝明るめスレート（2026-06-09 全体を明るく。元の漆黒へは「マラソン暗」で切り戻し可） */
+  --bg:#1d1e24;
+  --panel:#272935; --panel2:#30323f;
+  --line:rgba(236,227,208,.20); --line2:rgba(236,227,208,.44);
+  --cyan:#1ad0bd;            /* ティール（技術系アクセント） */
+  --orange:#ff5a1f;          /* マラソンの象徴色 */
+  --green:#2fd592; --mag:#ff5fb0; --gold:#ffbe33;
+  --ink:#f4eede; --dim:#b1aa99; --dimmer:#837d6e;
+  --sev1:#ff3b46; --sev2:#ff8a1f; --sev3:#ffc23d; --sev4:#3fb6ff;
+  --ok:#2fd592; --warn:#ffbe33; --bad:#ff3b46;
+  --glow:0 0 12px rgba(255,90,31,.40);
+}
+/* 背景演出（明るめスレート） */
+body.marathon{background:radial-gradient(125% 110% at 50% -12%,#2c2113 0%,#21222b 50%,#1b1c23 100%)!important}
+
+/* ── 切り戻し：元の漆黒マラソン（body.marathon.deep） ───────────── */
+body.marathon.deep{
   --bg:#0a0a0c;
   --panel:#121215; --panel2:#17171b;
   --line:rgba(236,227,208,.16); --line2:rgba(236,227,208,.34);
-  --cyan:#22e3d0;            /* ティール（技術系アクセント） */
-  --orange:#ff5a1f;          /* マラソンの象徴色 */
-  --green:#37e29a; --mag:#ff5fb0; --gold:#ffc23d;
+  --cyan:#22e3d0; --green:#37e29a; --gold:#ffc23d;
   --ink:#efe7d6; --dim:#9d978a; --dimmer:#6e695e;
-  --sev1:#ff3b46; --sev2:#ff8a1f; --sev3:#ffc23d; --sev4:#3fb6ff;
-  --ok:#37e29a; --warn:#ffc23d; --bad:#ff3b46;
-  --glow:0 0 12px rgba(255,90,31,.40);
+  --ok:#37e29a; --warn:#ffc23d;
 }
-/* 背景演出（暗所） */
-body.marathon{background:radial-gradient(125% 110% at 50% -12%,#1b1109 0%,#0b0a0c 52%,#070708 100%)!important}
+body.marathon.deep{background:radial-gradient(125% 110% at 50% -12%,#1b1109 0%,#0b0a0c 52%,#070708 100%)!important}
 body.marathon #matrix{opacity:.07}
 body.marathon .scanlines{opacity:.20}
 body.marathon .bg-grid{background:
@@ -533,7 +545,7 @@ body.marathon .bg-grid{background:
 body.marathon .vignette{box-shadow:inset 0 0 200px rgba(0,0,0,.6)}
 
 /* ---- トップバー（ハザードストライプ＋角ばった司令室ヘッダー） ---- */
-body.marathon .topbar{background:linear-gradient(180deg,rgba(20,16,12,.96),rgba(11,10,12,.92));backdrop-filter:blur(8px);
+body.marathon .topbar{background:linear-gradient(180deg,var(--panel2),var(--panel));backdrop-filter:blur(8px);
   border-bottom:2px solid var(--orange);padding:10px 18px;gap:16px;position:relative}
 body.marathon .topbar::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;
   background:repeating-linear-gradient(135deg,var(--orange) 0 10px,transparent 10px 20px);opacity:.5}
@@ -547,7 +559,7 @@ body.marathon .ico-btn:hover{color:var(--orange);border-color:var(--orange);back
 body.marathon .std-badge{background:rgba(255,90,31,.10);border:1px solid var(--orange);color:#ffb489;font-weight:700;border-radius:3px;letter-spacing:1px}
 
 /* ---- KPI（大型・色分け・一目で危険が分かる） ---- */
-body.marathon .statstrip{background:linear-gradient(180deg,rgba(18,18,21,.6),transparent);border-bottom:1px solid var(--line);
+body.marathon .statstrip{background:linear-gradient(180deg,rgba(236,227,208,.05),transparent);border-bottom:1px solid var(--line);
   padding:16px 18px;gap:12px;overflow-x:auto}
 body.marathon .kpi{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--line2);border-radius:4px;
   padding:13px 18px 14px;min-width:176px;flex:1;position:relative}
@@ -564,7 +576,7 @@ body.marathon .kpi.bad .kpi-k{color:#ff9aa0} body.marathon .kpi.bad::before{back
 
 /* ---- パネル / 分析カード（角ばったブロック＋HUD照準枠） ---- */
 body.marathon .view{padding:18px}
-body.marathon .panel,body.marathon .dpanel{position:relative;background:linear-gradient(180deg,rgba(22,22,26,.97),rgba(14,14,17,.97));
+body.marathon .panel,body.marathon .dpanel{position:relative;background:linear-gradient(180deg,var(--panel2),var(--panel));
   border:1px solid var(--line2);border-radius:0;box-shadow:0 0 0 1px rgba(0,0,0,.35),0 8px 30px rgba(0,0,0,.45)}
 body.marathon .dpanel{padding:0;overflow:visible;transition:border-color .15s,box-shadow .15s}
 body.marathon .panel{overflow:visible}
@@ -591,7 +603,7 @@ body.marathon .trend{background:repeating-linear-gradient(0deg,rgba(236,227,208,
 body.marathon .tr-bars i{filter:drop-shadow(0 0 4px rgba(34,227,208,.4))}
 
 /* ---- テーブル（高コントラスト・骨色文字） ---- */
-body.marathon table.inc th{background:#1c1c20;color:var(--orange);border-bottom:2px solid var(--line2);font-size:10.5px;
+body.marathon table.inc th{background:var(--panel2);color:var(--orange);border-bottom:2px solid var(--line2);font-size:10.5px;
   letter-spacing:1px;text-transform:uppercase}
 body.marathon table.inc td{border-bottom:1px solid var(--line)}
 body.marathon table.inc tbody tr:hover{background:rgba(255,90,31,.08)}
@@ -616,7 +628,7 @@ body.marathon .btn-ghost:hover{border-color:var(--orange);color:var(--orange);ba
 body.marathon .btn-del{border-radius:3px}
 
 /* ---- ドロワー / ダイアログ ---- */
-body.marathon .drawer{background:linear-gradient(180deg,#15120f,#0c0b0d);border-left:2px solid var(--orange)}
+body.marathon .drawer{background:linear-gradient(180deg,var(--panel2),var(--panel));border-left:2px solid var(--orange)}
 body.marathon .dr-title{color:var(--ink)}
 body.marathon .dlg-box{border-radius:5px;border-color:var(--line2)}
 body.marathon .form-row label{color:var(--cyan);letter-spacing:1px;text-transform:uppercase;font-size:11px}
@@ -626,11 +638,11 @@ body.marathon .donut{--sz:150px}
 body.marathon .donut-hole b{font-size:30px;color:var(--ink)}
 body.marathon .donut-legend{min-width:160px}
 body.marathon .lg-row{font-size:13px}
-body.marathon .mb-row{font-size:12.5px;margin-bottom:2px}
+body.marathon .mb-row{font-size:12.5px;margin-bottom:3px}
 body.marathon .mb-row .lbl{width:74px;color:var(--ink)}
-body.marathon .mb-track{height:12px;border-radius:2px;background:rgba(236,227,208,.08)}
-body.marathon .mb-fill{border-radius:2px}
-body.marathon .mb-row .num{font-weight:800;color:var(--ink);font-family:var(--mono)}
+body.marathon .mb-track{height:13px;border-radius:2px;background:rgba(0,0,0,.30);border:1px solid var(--line)}
+body.marathon .mb-fill{border-radius:2px;box-shadow:0 0 8px rgba(255,255,255,.18) inset,0 0 6px rgba(0,0,0,.25)}
+body.marathon .mb-row .num{font-weight:800;color:var(--ink);font-family:var(--mono);font-size:13px}
 
 /* ドーナツ中央の数字 */
 .donut-hole b{color:var(--ink)}

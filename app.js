@@ -294,7 +294,7 @@ function donut(byStatus,total){
 }
 function bars(obj,labelFn,colFn){
   const max=Math.max(1,...Object.values(obj));
-  return Object.entries(obj).map(([k,v])=>`<div class="mb-row"><span class="lbl">${esc(labelFn(k))}</span><span class="mb-track"><span class="mb-fill" style="width:${v/max*100}%;background:${colFn(k)}"></span></span><span class="num">${v}</span></div>`).join('');
+  return Object.entries(obj).map(([k,v])=>`<div class="mb-row"><span class="lbl">${esc(labelFn(k))}</span><span class="mb-track"><span class="mb-fill" style="width:${v/max*100}%;${v>0?'min-width:10px;':''}background:${colFn(k)}"></span></span><span class="num">${v}</span></div>`).join('');
 }
 function trendChart(trend){
   const max=Math.max(1,...trend.map(t=>Math.max(t.opened,t.resolved)));
@@ -720,13 +720,14 @@ function startTutorial(force){
 
 /* ============================================================ INIT */
 /* ============================================================ THEME（切替式・いつでも戻せる） */
-const THEMES=['marathon','classic','light'];
-const THEME_LABEL={marathon:'マラソン',classic:'クラシック',light:'ライト'};
-const THEME_ICON={marathon:'◣',classic:'▦',light:'☀'};
+const THEMES=['marathon','marathon-deep','classic','light'];
+const THEME_LABEL={marathon:'マラソン明','marathon-deep':'マラソン暗',classic:'クラシック',light:'ライト'};
+const THEME_ICON={marathon:'◤','marathon-deep':'◣',classic:'▦',light:'☀'};
 function applyTheme(name){
   if(!THEMES.includes(name)) name='marathon';
-  document.body.classList.remove('marathon','light');
+  document.body.classList.remove('marathon','deep','light');
   if(name==='marathon') document.body.classList.add('marathon');
+  else if(name==='marathon-deep') document.body.classList.add('marathon','deep');
   else if(name==='light') document.body.classList.add('light');
   document.body.dataset.theme=name;
   const b=$('#btn-theme'); if(b){ b.textContent=THEME_ICON[name]; b.title=`テーマ: ${THEME_LABEL[name]}（クリックで切替）`; }
