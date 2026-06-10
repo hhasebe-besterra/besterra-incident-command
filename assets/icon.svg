@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="BESTERRA INCIDENT COMMAND">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="34%" r="78%">
+      <stop offset="0%"  stop-color="#1d0f0a"/>
+      <stop offset="48%" stop-color="#0c0b0d"/>
+      <stop offset="100%" stop-color="#060607"/>
+    </radialGradient>
+    <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#ff7a2f"/>
+      <stop offset="55%" stop-color="#ff5a1f"/>
+      <stop offset="100%" stop-color="#e8400a"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3ff3df"/>
+      <stop offset="100%" stop-color="#13b9aa"/>
+    </linearGradient>
+    <linearGradient id="bred" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%"  stop-color="#ff3b46"/>
+      <stop offset="55%" stop-color="#e2151f"/>
+      <stop offset="100%" stop-color="#c8161d"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glowS" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="redglow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="7" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="tile"><rect x="16" y="16" width="480" height="480" rx="96"/></clipPath>
+  </defs>
+
+  <!-- base tile -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="url(#bg)"/>
+
+  <g clip-path="url(#tile)">
+    <!-- scanlines -->
+    <g opacity="0.10" stroke="#ffd9b8" stroke-width="2">
+      <line x1="16" y1="60"  x2="496" y2="60"/>
+      <line x1="16" y1="120" x2="496" y2="120"/>
+      <line x1="16" y1="180" x2="496" y2="180"/>
+      <line x1="16" y1="240" x2="496" y2="240"/>
+      <line x1="16" y1="300" x2="496" y2="300"/>
+      <line x1="16" y1="360" x2="496" y2="360"/>
+      <line x1="16" y1="420" x2="496" y2="420"/>
+    </g>
+    <!-- hazard stripe top -->
+    <g opacity="0.85">
+      <rect x="16" y="16" width="480" height="22" fill="#0d0b0a"/>
+      <g fill="url(#orange)">
+        <polygon points="16,16 56,16 24,38 16,38"/>
+        <polygon points="76,16 116,16 84,38 44,38"/>
+        <polygon points="136,16 176,16 144,38 104,38"/>
+        <polygon points="196,16 236,16 204,38 164,38"/>
+        <polygon points="256,16 296,16 264,38 224,38"/>
+        <polygon points="316,16 356,16 324,38 284,38"/>
+        <polygon points="376,16 416,16 384,38 344,38"/>
+        <polygon points="436,16 476,16 444,38 404,38"/>
+        <polygon points="496,16 496,38 464,38"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- outer HUD octagon -->
+  <polygon points="256,70 384,118 442,256 384,394 256,442 128,394 70,256 128,118"
+           fill="none" stroke="url(#orange)" stroke-width="9" filter="url(#glow)" opacity="0.95"/>
+  <!-- inner thin octagon -->
+  <polygon points="256,104 360,143 408,256 360,369 256,408 152,369 104,256 152,143"
+           fill="none" stroke="#ff5a1f" stroke-width="2.5" opacity="0.5"/>
+
+  <!-- segmented targeting ring (teal) -->
+  <g fill="none" stroke="url(#teal)" stroke-width="7" stroke-linecap="butt" filter="url(#glowS)" opacity="0.9">
+    <circle cx="256" cy="256" r="158" stroke-dasharray="48 42" stroke-dashoffset="10"/>
+  </g>
+  <g fill="none" stroke="#13b9aa" stroke-width="2" opacity="0.4">
+    <circle cx="256" cy="256" r="134"/>
+  </g>
+
+  <!-- crosshair ticks -->
+  <g stroke="#ffd9b8" stroke-width="5" opacity="0.85" stroke-linecap="round">
+    <line x1="256" y1="86"  x2="256" y2="118"/>
+    <line x1="256" y1="394" x2="256" y2="426"/>
+    <line x1="86"  y1="256" x2="118" y2="256"/>
+    <line x1="394" y1="256" x2="426" y2="256"/>
+  </g>
+
+  <!-- ===== BESTERRA brand mark (centerpiece) ===== -->
+  <g filter="url(#redglow)" transform="translate(219,151) scale(2.36)">
+    <path fill="url(#bred)" d="M19.9,21.6c-2.8,.5-6.1,1.6-9.7,3.2V0H5.4V55.5c-1.6,1.7-3.4,3.5-5.4,5.5v27.9c.6-.8,1.3-1.5,1.9-2.3,13.9-18.4,22.1-34.2,24.2-38.8,1.8-4,3-7.5,3.8-10.5,.6-2.6,1-4.8,.9-6.8,0-3.2-.9-5.4-2.4-7-2.1-2.2-4.6-2.5-8.5-1.9m-.8,14.4c-1.5,4.2-4.1,8.7-8.9,14.3V25.4c1.7-.5,3.2-.8,4.5-.9,2.9-.1,5,.9,5.6,3.7,.3,1.9-.1,4.5-1.2,7.8"/>
+  </g>
+
+  <!-- HUD corner brackets -->
+  <g stroke="url(#orange)" stroke-width="7" fill="none" stroke-linecap="square" filter="url(#glowS)">
+    <path d="M64 132 V64 H132"/>
+    <path d="M448 380 V448 H380"/>
+  </g>
+  <g stroke="#13b9aa" stroke-width="3.5" fill="none" opacity="0.7">
+    <path d="M380 64 H448 V132"/>
+    <path d="M132 448 H64 V380"/>
+  </g>
+
+  <!-- micro labels -->
+  <g fill="#ff7a2f" opacity="0.92" font-family="'Share Tech Mono','JetBrains Mono',monospace">
+    <text x="256" y="470" text-anchor="middle" font-size="27" letter-spacing="4">BESTERRA · IC</text>
+  </g>
+  <g fill="#7fe9dd" opacity="0.6" font-family="'Share Tech Mono','JetBrains Mono',monospace">
+    <text x="80" y="58" font-size="18" letter-spacing="2">//SEC</text>
+    <text x="432" y="58" font-size="18" letter-spacing="2" text-anchor="end">A1</text>
+  </g>
+</svg>

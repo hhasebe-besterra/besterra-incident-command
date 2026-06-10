@@ -5,10 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title>BESTERRA // INCIDENT COMMAND</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=1">
+<link rel="apple-touch-icon" href="assets/icon.svg?v=1">
+<meta name="theme-color" content="#ff5a1f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20">
+<link rel="stylesheet" href="app.css?v=21">
 </head>
 <body class="booting">
 
@@ -22,7 +25,7 @@
 <section id="login" class="login-screen">
   <div class="login-box">
     <div class="login-brand">
-      <span class="logo-mark">◤◢</span>
+      <img class="brand-logo" src="assets/icon.svg?v=1" alt="INCIDENT COMMAND" width="56" height="56">
       <div>
         <div class="brand-title" data-text="BESTERRA // INCIDENT COMMAND">BESTERRA // INCIDENT COMMAND</div>
         <div class="brand-sub">ベステラIT — SECURE INCIDENT OPERATIONS CONSOLE</div>
@@ -51,7 +54,7 @@
 <main id="app" hidden>
   <header class="topbar">
     <div class="tb-left">
-      <span class="logo-mark sm">◤◢</span>
+      <img class="brand-logo sm" src="assets/favicon.svg?v=1" alt="" width="30" height="30">
       <span class="tb-brand">INCIDENT&nbsp;COMMAND</span>
       <button class="std-badge" id="btn-model" title="準拠モデルを表示">ITIL 4 / HDI 準拠</button>
       <span class="tb-tag" id="tb-tag"></span>
